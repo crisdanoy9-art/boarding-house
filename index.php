@@ -45,7 +45,7 @@ try {
     <ul class="public-nav-links">
         <li><a href="#features">Features</a></li>
         <li><a href="#rules">Rules</a></li>
-        <li><a href="#developer">About</a></li>
+        <li><a href="#about">About</a></li>
         <li><a href="<?= APP_URL ?>/auth/login.php">Login</a></li>
     </ul>
     <div class="public-nav-actions">
@@ -135,44 +135,56 @@ try {
     </div>
 </section>
 
-<!-- ── Developer Section ── -->
-<section id="developer" class="dev-section">
-    <div style="max-width:900px;margin:0 auto;text-align:center;">
-        <span style="display:inline-flex;align-items:center;gap:7px;padding:5px 16px;border-radius:99px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);font-size:.72rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;"><i class="fas fa-laptop-code"></i> System Developer</span>
-        <h2 class="section-title" style="margin-bottom:8px;">Built with ♥ by Cris Danoy</h2>
-        <p style="color:var(--muted);font-size:.88rem;max-width:520px;margin:0 auto 36px;line-height:1.75;">
-            Full-stack developer who designed and built the entire Nadelas Boarding House Online Booking & Management System — from database to UI.
-        </p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:32px;">
-            <div class="dev-card">
-                <div class="dev-avatar-default" style="width:72px;height:72px;font-size:1.3rem;">CD</div>
-                <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--white);margin-bottom:4px;">Cris Danoy</div>
-                <div style="font-size:.76rem;color:var(--gold);margin-bottom:12px;">Full-Stack Developer · System Architect</div>
-                <div style="display:flex;flex-direction:column;gap:7px;">
-                    <?php foreach ([['fa-phone','09633951825','tel:09633951825'],['fa-envelope','crisdanoy9@gmail.com','mailto:crisdanoy9@gmail.com'],['fab fa-facebook','Facebook Profile','https://www.facebook.com/cris.danoy.7/']] as [$ico,$lbl,$href]): ?>
-                    <a href="<?= $href ?>" target="_blank" class="tech-badge" style="justify-content:center;">
-                        <i class="<?= $ico ?>"></i> <?= $lbl ?>
-                    </a>
-                    <?php endforeach; ?>
+<!-- ── About Section (Pricing & developer credit removed) ── -->
+<section id="about" style="background:var(--bg);padding:70px 40px;">
+    <div style="max-width:1100px;margin:0 auto;">
+        <!-- Main heading -->
+        <div style="text-align:center;margin-bottom:48px;">
+            <h2 class="section-title" style="font-size:2.2rem;">A Smarter Way to Manage Boarding Houses</h2>
+            <p style="color:var(--muted);max-width:750px;margin:16px auto 0;line-height:1.7;">
+                The <strong style="color:var(--gold);">Nadelas Boarding House Management System</strong> is a web-based platform designed to simplify and digitize the day-to-day operations of a boarding house.
+                It eliminates paper-based processes and manual record-keeping by providing a centralized, easy-to-use system for both administrators and tenants.
+            </p>
+        </div>
+
+        <!-- Admin & Tenant roles -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:56px;">
+            <div style="background:rgba(201,168,76,.05);border-left:4px solid var(--gold);border-radius:var(--r-md);padding:28px;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <i class="fas fa-user-shield" style="font-size:2rem;color:var(--gold);"></i>
+                    <h3 style="font-family:var(--font-display);color:var(--white);font-size:1.3rem;margin:0;">For Administrators</h3>
                 </div>
+                <p style="color:var(--muted);font-size:.9rem;line-height:1.7;">Manage rooms and beds by floor, approve or reject tenant reservations, track monthly payments, monitor occupancy rates in real-time, and generate income and occupancy reports — all from a single dashboard.</p>
             </div>
-            <div class="dev-card" style="text-align:left;">
-                <div style="font-family:var(--font-display);font-size:.9rem;color:var(--white);margin-bottom:14px;"><i class="fas fa-code" style="color:var(--gold);margin-right:7px;"></i>Tech Stack</div>
-                <div style="display:flex;flex-wrap:wrap;gap:7px;">
-                    <?php foreach (['PHP 8','PostgreSQL 15','HTML5','CSS3','JS ES6','Chart.js','PDO','BCrypt','Apache'] as $t): ?>
-                    <span class="tech-badge"><?= $t ?></span>
-                    <?php endforeach; ?>
+            <div style="background:rgba(201,168,76,.05);border-left:4px solid var(--gold);border-radius:var(--r-md);padding:28px;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <i class="fas fa-users" style="font-size:2rem;color:var(--gold);"></i>
+                    <h3 style="font-family:var(--font-display);color:var(--white);font-size:1.3rem;margin:0;">For Tenants</h3>
                 </div>
-            </div>
-            <div class="dev-card" style="text-align:left;">
-                <div style="font-family:var(--font-display);font-size:.9rem;color:var(--white);margin-bottom:14px;"><i class="fas fa-star" style="color:var(--gold);margin-right:7px;"></i>System Features</div>
-                <ul style="list-style:none;display:grid;gap:6px;">
-                    <?php foreach (['18 Rooms · 72 Beds · 3 Floors','Admin announcement system','Real-time occupancy charts','Printable payment receipts','Profile photo uploads','Maintenance mode lockdown','PostgreSQL advanced features'] as $f): ?>
-                    <li style="font-size:.76rem;color:var(--muted);display:flex;gap:6px;"><i class="fas fa-check" style="color:var(--gold);margin-top:3px;"></i><?= $f ?></li>
-                    <?php endforeach; ?>
-                </ul>
+                <p style="color:var(--muted);font-size:.9rem;line-height:1.7;">Browse available rooms, select a specific bed, submit reservations online, view their payment history, and update their profile — anytime, anywhere.</p>
             </div>
         </div>
+
+        <!-- Value proposition / why it matters -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:48px;">
+            <div style="text-align:center;">
+                <i class="fas fa-file-alt" style="font-size:2rem;color:var(--gold);margin-bottom:12px;"></i>
+                <div style="font-weight:600;color:var(--white);margin-bottom:6px;">Paperless Operations</div>
+                <p style="color:var(--muted);font-size:.75rem;">No more lost records or messy ledgers</p>
+            </div>
+            <div style="text-align:center;">
+                <i class="fas fa-chart-simple" style="font-size:2rem;color:var(--gold);margin-bottom:12px;"></i>
+                <div style="font-weight:600;color:var(--white);margin-bottom:6px;">Real-Time Insights</div>
+                <p style="color:var(--muted);font-size:.75rem;">Occupancy & income at a glance</p>
+            </div>
+            <div style="text-align:center;">
+                <i class="fas fa-mobile-alt" style="font-size:2rem;color:var(--gold);margin-bottom:12px;"></i>
+                <div style="font-weight:600;color:var(--white);margin-bottom:6px;">Anywhere Access</div>
+                <p style="color:var(--muted);font-size:.75rem;">Manage or book from any device</p>
+            </div>
+        </div>
+
+        <!-- No pricing block, no developer credit line -->
     </div>
 </section>
 
