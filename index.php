@@ -76,7 +76,7 @@ try {
     </div>
 </section>
 
-<!-- ── Features (expanded, GCash removed) ── -->
+<!-- ── Features (Electricity Included added) ── -->
 <section class="features-section" id="features">
     <h2 class="section-title">Why Choose Nadelas?</h2>
     <p class="section-sub">Everything you need for comfortable, affordable boarding life</p>
@@ -89,7 +89,7 @@ try {
             ['fa-map-marker-alt','Prime Location',      'Near schools, markets, and transport in Dapitan City.'],
             ['fa-tag',          'Affordable Rates',     'Best value boarding house with fixed ₱1,300/month, no hidden fees.'],
             ['fa-hand-sparkles', 'Clean & Hygienic',    'Daily cleaning of common areas and strict sanitation protocols.'],
-            ['fa-heart',        'Friendly Community',   'Live with respectful tenants and approachable management.'],
+            ['fa-bolt',         'Electricity Included', 'Electricity is already covered in your monthly rent — no extra bills!'],
         ] as [$ico,$title,$desc]): ?>
         <div class="feature-card">
             <div class="feature-icon"><i class="fas <?= $ico ?>"></i></div>
@@ -100,7 +100,7 @@ try {
     </div>
 </section>
 
-<!-- ── House Rules (GCash removed from Payment Policy) ── -->
+<!-- ── House Rules (no GCash) ── -->
 <section id="rules" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:70px 40px;">
     <div style="max-width:1200px;margin:0 auto;">
         <div style="text-align:center;margin-bottom:48px;">
