@@ -76,18 +76,20 @@ try {
     </div>
 </section>
 
-<!-- ── Features ── -->
+<!-- ── Features (expanded, GCash removed) ── -->
 <section class="features-section" id="features">
     <h2 class="section-title">Why Choose Nadelas?</h2>
     <p class="section-sub">Everything you need for comfortable, affordable boarding life</p>
     <div class="features-grid">
         <?php foreach ([
-            ['fa-wifi',         'High-Speed WiFi',    'Stay connected with reliable internet in every room.'],
-            ['fa-shield-alt',   '24/7 Security',      'Round-the-clock security for your peace of mind.'],
-            ['fa-calendar-check','Easy Online Booking','Reserve your bed online in minutes — no paperwork.'],
-            ['fa-water',        'Water Included',     'Utilities included in your monthly ₱1,300 rate.'],
-            ['fa-map-marker-alt','Prime Location',    'Near schools, markets, and transport in CDO.'],
-            ['fa-mobile-alt',   'GCash Payments',     'Pay your deposit and rent cashlessly via GCash.'],
+            ['fa-wifi',         'High-Speed WiFi',      'Stay connected with reliable internet in every room.'],
+            ['fa-shield-alt',   '24/7 Security',        'Round-the-clock security for your peace of mind.'],
+            ['fa-calendar-check','Easy Online Booking', 'Reserve your bed online in minutes — no paperwork.'],
+            ['fa-water',        'Water Included',       'Utilities included in your monthly ₱1,300 rate.'],
+            ['fa-map-marker-alt','Prime Location',      'Near schools, markets, and transport in Dapitan City.'],
+            ['fa-tag',          'Affordable Rates',     'Best value boarding house with fixed ₱1,300/month, no hidden fees.'],
+            ['fa-hand-sparkles', 'Clean & Hygienic',    'Daily cleaning of common areas and strict sanitation protocols.'],
+            ['fa-heart',        'Friendly Community',   'Live with respectful tenants and approachable management.'],
         ] as [$ico,$title,$desc]): ?>
         <div class="feature-card">
             <div class="feature-icon"><i class="fas <?= $ico ?>"></i></div>
@@ -98,7 +100,7 @@ try {
     </div>
 </section>
 
-<!-- ── House Rules (New from screenshot) ── -->
+<!-- ── House Rules (GCash removed from Payment Policy) ── -->
 <section id="rules" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:70px 40px;">
     <div style="max-width:1200px;margin:0 auto;">
         <div style="text-align:center;margin-bottom:48px;">
@@ -115,7 +117,7 @@ try {
                 ['fa-smoking-ban', 'No Smoking & Vaping', 'Smoking and vaping are strictly prohibited inside all rooms and common areas. Violators may be asked to vacate the premises.'],
                 ['fa-wine-bottle', 'No Alcohol / Illegal Substances', 'Possession or consumption of alcohol inside the boarding house is discouraged. Illegal substances are absolutely prohibited and will result in immediate eviction.'],
                 ['fa-broom', 'Cleanliness & Hygiene', 'Keep your bed space and surrounding area clean at all times. Shared spaces such as bathrooms and common areas must be tidied after use. Schedule bathroom cleaning rotation.'],
-                ['fa-money-bill-wave', 'Monthly Rent Payment', 'Rent of ₱1,300/month is due on the 1st of every month. A ₱1,300 advance deposit is required upon approval. Late payments may incur penalties.'],
+                ['fa-money-bill-wave', 'Monthly Rent Payment', 'Rent of ₱1,300/month is due on the 1st of every month. A ₱1,300 advance deposit is required upon approval. Late payments may incur penalties. Payments accepted in cash only.'],
                 ['fa-lightbulb', 'Electricity Conservation', 'Turn off all lights, electric fans, and appliances when not in use or when leaving the room. High-wattage appliances (e.g., electric stoves) are not allowed.'],
                 ['fa-water', 'Water Usage', 'Avoid wasting water. Report any leaking faucets or pipes to management immediately. Do not use the bathroom for laundry purposes without permission.'],
                 ['fa-tools', 'Property Care', 'Tenants are responsible for any damage caused to the room, furniture, or facilities. Nailing, drilling, or altering the room walls and fixtures is not allowed.'],
