@@ -98,47 +98,52 @@ try {
     </div>
 </section>
 
-<!-- ── House Rules ── -->
+<!-- ── House Rules (New from screenshot) ── -->
 <section id="rules" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:70px 40px;">
-    <div style="max-width:1100px;margin:0 auto;">
-        <div style="text-align:center;margin-bottom:40px;">
+    <div style="max-width:1200px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:48px;">
             <span style="display:inline-flex;align-items:center;gap:7px;padding:5px 16px;border-radius:99px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);font-size:.72rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;"><i class="fas fa-gavel"></i> House Policies</span>
             <h2 class="section-title">Rules & Regulations</h2>
             <p class="section-sub">All tenants must follow these rules. Violations may result in eviction.</p>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;margin-bottom:24px;">
-        <?php foreach ([
-            ['01','Payment Policy','peso-sign',['Monthly rent of ₱1,300 due on the 1st of every month','₱1,300 advance deposit required upon approval','Payments via Cash or GCash (09633951825)','3 months unpaid = automatic eviction','Late penalties apply after the 5th of the month']],
-            ['02','Curfew & Visitors','clock',['Curfew strictly at 10:00 PM nightly','Visitors allowed until 8:00 PM only','Overnight visitors are strictly prohibited','Visitors must sign in at the entrance','Tenants responsible for visitor conduct']],
-            ['03','Cleanliness & Noise','broom',['Keep your room and shared areas clean','Garbage in designated bins only','No loud music after 9:00 PM','Shared bathrooms must be left clean','No food inside rooms (pest prevention)']],
-            ['04','Prohibited Items','ban',['Smoking & vaping strictly prohibited inside','No alcohol consumption in rooms','Illegal drugs and weapons absolutely banned','No pets allowed','No cooking appliances in rooms']],
-            ['05','Security & Property','shield-alt',['Tenants responsible for own valuables','Do not share keys with outsiders','Report damage or issues immediately','Willful damage charged to tenant','Always lock your room when leaving']],
-            ['06','Check-Out Policy','door-open',['15-day advance notice required','Room must be left clean','Settle all balances before leaving','Return keys to admin upon departure','Advance deposit is non-refundable']],
-        ] as [$num,$title,$icon,$items]): ?>
-        <div class="rule-card-tenant">
-            <div class="rule-card-header">
-                <div class="rule-num"><?= $num ?></div>
-                <div><div style="font-family:var(--font-display);color:var(--white);font-size:.95rem;"><?= $title ?></div></div>
+        
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px;">
+            <?php 
+            $rules = [
+                ['fa-clock', 'Quiet Hours', 'Quiet hours are strictly observed from 10:00 PM to 6:00 AM. Loud music, shouting, and disruptive behavior are not allowed during these hours.'],
+                ['fa-user-friends', 'Visitor Policy', 'Visitors are welcome until 9:00 PM only. Overnight visitors are strictly prohibited. All visitors must be registered at the front office.'],
+                ['fa-smoking-ban', 'No Smoking & Vaping', 'Smoking and vaping are strictly prohibited inside all rooms and common areas. Violators may be asked to vacate the premises.'],
+                ['fa-wine-bottle', 'No Alcohol / Illegal Substances', 'Possession or consumption of alcohol inside the boarding house is discouraged. Illegal substances are absolutely prohibited and will result in immediate eviction.'],
+                ['fa-broom', 'Cleanliness & Hygiene', 'Keep your bed space and surrounding area clean at all times. Shared spaces such as bathrooms and common areas must be tidied after use. Schedule bathroom cleaning rotation.'],
+                ['fa-money-bill-wave', 'Monthly Rent Payment', 'Rent of ₱1,300/month is due on the 1st of every month. A ₱1,300 advance deposit is required upon approval. Late payments may incur penalties.'],
+                ['fa-lightbulb', 'Electricity Conservation', 'Turn off all lights, electric fans, and appliances when not in use or when leaving the room. High-wattage appliances (e.g., electric stoves) are not allowed.'],
+                ['fa-water', 'Water Usage', 'Avoid wasting water. Report any leaking faucets or pipes to management immediately. Do not use the bathroom for laundry purposes without permission.'],
+                ['fa-tools', 'Property Care', 'Tenants are responsible for any damage caused to the room, furniture, or facilities. Nailing, drilling, or altering the room walls and fixtures is not allowed.'],
+                ['fa-door-closed', 'Curfew', 'The main gate is locked at 11:00 PM. Tenants who will be late must inform management in advance.'],
+                ['fa-paw', 'No Pets Allowed', 'Keeping pets of any kind inside the boarding house is strictly not allowed to maintain cleanliness and avoid disturbances.'],
+                ['fa-hand-peace', 'Respect & Conduct', 'Treat all co-tenants and management with respect. Harassment, bullying, or any form of misconduct will not be tolerated.']
+            ];
+            foreach ($rules as [$icon, $title, $desc]): ?>
+            <div class="rule-card-tenant" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all 0.2s;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                    <i class="fas <?= $icon ?>" style="color:var(--gold);font-size:1.4rem;"></i>
+                    <h3 style="font-family:var(--font-display);color:var(--white);font-size:1rem;margin:0;"><?= $title ?></h3>
+                </div>
+                <p style="color:var(--muted);font-size:.8rem;line-height:1.6;margin:0;"><?= $desc ?></p>
             </div>
-            <ul class="rule-list">
-                <?php foreach ($items as $item): ?>
-                <li><i class="fas fa-diamond"></i><?= $item ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
-        </div>
-        <div style="background:rgba(240,82,82,.06);border:1px solid rgba(240,82,82,.18);border-radius:var(--r-lg);padding:14px 20px;text-align:center;">
+        
+        <div style="background:rgba(240,82,82,.06);border:1px solid rgba(240,82,82,.18);border-radius:var(--r-lg);padding:14px 20px;text-align:center;margin-top:32px;">
             <i class="fas fa-exclamation-triangle" style="color:var(--danger);margin-right:7px;"></i>
             <span style="font-size:.84rem;color:var(--muted);">Violation of rules may result in <strong style="color:var(--danger);">immediate eviction</strong> without refund. All tenants sign an agreement upon move-in.</span>
         </div>
     </div>
 </section>
 
-<!-- ── About Section (Pricing & developer credit removed) ── -->
+<!-- ── About Section ── -->
 <section id="about" style="background:var(--bg);padding:70px 40px;">
     <div style="max-width:1100px;margin:0 auto;">
-        <!-- Main heading -->
         <div style="text-align:center;margin-bottom:48px;">
             <h2 class="section-title" style="font-size:2.2rem;">A Smarter Way to Manage Boarding Houses</h2>
             <p style="color:var(--muted);max-width:750px;margin:16px auto 0;line-height:1.7;">
@@ -147,7 +152,6 @@ try {
             </p>
         </div>
 
-        <!-- Admin & Tenant roles -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:56px;">
             <div style="background:rgba(201,168,76,.05);border-left:4px solid var(--gold);border-radius:var(--r-md);padding:28px;">
                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
@@ -165,7 +169,6 @@ try {
             </div>
         </div>
 
-        <!-- Value proposition / why it matters -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:48px;">
             <div style="text-align:center;">
                 <i class="fas fa-file-alt" style="font-size:2rem;color:var(--gold);margin-bottom:12px;"></i>
@@ -183,8 +186,6 @@ try {
                 <p style="color:var(--muted);font-size:.75rem;">Manage or book from any device</p>
             </div>
         </div>
-
-        <!-- No pricing block, no developer credit line -->
     </div>
 </section>
 
