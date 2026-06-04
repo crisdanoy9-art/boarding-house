@@ -135,16 +135,6 @@ try {
     </div>
 </section>
 
-<!-- ── CTA ── -->
-<section style="background:linear-gradient(135deg,rgba(201,168,76,.1) 0%,transparent 60%);border-top:1px solid var(--border);padding:64px 40px;text-align:center;">
-    <h2 style="font-family:var(--font-display);font-size:1.9rem;color:var(--white);margin-bottom:12px;">Ready to Move In?</h2>
-    <p style="color:var(--muted);max-width:400px;margin:0 auto 28px;font-size:.88rem;">Create your account, choose your bed, and start your comfortable stay with us.</p>
-    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
-        <a href="<?= APP_URL ?>/auth/register.php" class="btn btn-primary btn-lg"><i class="fas fa-user-plus"></i> Create Account</a>
-        <a href="<?= APP_URL ?>/auth/login.php"    class="btn btn-outline btn-lg"><i class="fas fa-sign-in-alt"></i> Sign In</a>
-    </div>
-</section>
-
 <!-- ── Developer Section ── -->
 <section id="developer" class="dev-section">
     <div style="max-width:900px;margin:0 auto;text-align:center;">
