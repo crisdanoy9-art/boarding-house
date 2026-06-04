@@ -45,7 +45,6 @@ try {
     <ul class="public-nav-links">
         <li><a href="#features">Features</a></li>
         <li><a href="#rules">Rules</a></li>
-        <li><a href="#gcash">GCash</a></li>
         <li><a href="#developer">About</a></li>
         <li><a href="<?= APP_URL ?>/auth/login.php">Login</a></li>
     </ul>
@@ -61,10 +60,9 @@ try {
     <div class="hero-content">
         <div class="hero-eyebrow"><i class="fas fa-star"></i> Nadelas Boarding House · DAPITAN CITY</div>
         <h1>Your <span class="accent">Perfect Room</span><br>Awaits You</h1>
-        <p>Modern, affordable boarding rooms with secure online booking and GCash payments. Live well, pay smart.</p>
+        <p>Modern, affordable boarding rooms with secure online booking. Live well, pay smart.</p>
         <div class="hero-cta">
             <a href="<?= APP_URL ?>/auth/register.php" class="btn btn-primary btn-lg"><i class="fas fa-bed"></i> Book a Room</a>
-            <a href="#gcash" class="btn btn-ghost btn-lg"><i class="fas fa-qrcode"></i> Pay via GCash</a>
         </div>
     </div>
 </section>
@@ -137,56 +135,10 @@ try {
     </div>
 </section>
 
-<!-- ── GCash Section ── -->
-<section id="gcash" style="padding:70px 40px;">
-    <div style="max-width:920px;margin:0 auto;">
-        <div style="text-align:center;margin-bottom:40px;">
-            <h2 class="section-title">Pay via GCash</h2>
-            <p class="section-sub">Fast, safe, and cashless — accepted for advance deposit and monthly rent</p>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
-            <!-- QR Card -->
-            <div style="background:linear-gradient(135deg,#0060a0 0%,#003566 60%,#001e3c 100%);border-radius:var(--r-xl);padding:34px;text-align:center;box-shadow:0 8px 48px rgba(0,96,160,.4);position:relative;overflow:hidden;">
-                <div style="position:absolute;top:-40px;right:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.05);"></div>
-                <div style="font-family:var(--font-display);font-size:1.7rem;color:#fff;font-weight:700;margin-bottom:5px;position:relative;z-index:1;">G<span style="color:#5ecfff;">Cash</span></div>
-                <div style="font-size:.64rem;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px;position:relative;z-index:1;">Scan to Pay</div>
-                <div style="background:#fff;border-radius:var(--r-md);padding:12px;display:inline-block;box-shadow:0 4px 20px rgba(0,0,0,.35),0 0 0 4px rgba(255,255,255,.1);margin-bottom:16px;position:relative;z-index:1;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=<?= urlencode('GCash|09633951825|Cris Danoy') ?>&bgcolor=ffffff&color=000000&margin=6"
-                         alt="GCash QR 09633951825" width="170" height="170" style="display:block;">
-                </div>
-                <div style="font-family:var(--font-display);font-size:1.3rem;color:#fff;font-weight:700;letter-spacing:.04em;position:relative;z-index:1;">09633951825</div>
-                <div style="font-size:.78rem;color:rgba(255,255,255,.65);margin-bottom:16px;position:relative;z-index:1;">Cris Danoy · Nadelas Boarding House</div>
-                <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:8px 20px;font-size:.88rem;font-weight:700;color:#fff;position:relative;z-index:1;">
-                    <i class="fas fa-peso-sign"></i> ₱1,300 Advance Deposit
-                </div>
-            </div>
-            <!-- Instructions -->
-            <div style="display:grid;gap:14px;">
-                <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-                    <div style="font-family:var(--font-display);font-size:.95rem;color:var(--white);margin-bottom:14px;"><i class="fas fa-list-ol" style="color:var(--gold);margin-right:8px;"></i>How to Book</div>
-                    <div style="display:grid;gap:9px;">
-                        <?php foreach (['Register an account on this website','Browse rooms and select your preferred bed','Open GCash → Send Money → 09633951825','Send exactly ₱1,300.00 as advance deposit','Copy your GCash Reference Number','Enter the ref number when submitting reservation','Admin verifies payment and approves your booking'] as $i=>$step): ?>
-                        <div style="display:flex;gap:11px;align-items:flex-start;font-size:.81rem;">
-                            <div style="width:24px;height:24px;border-radius:50%;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.68rem;color:var(--gold);font-weight:700;flex-shrink:0;"><?= $i+1 ?></div>
-                            <div style="color:var(--muted);padding-top:3px;"><?= $step ?></div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                <div style="background:rgba(240,168,50,.07);border:1px solid rgba(240,168,50,.2);border-radius:var(--r-lg);padding:14px 16px;font-size:.8rem;color:var(--muted);">
-                    <div style="color:var(--warning);font-weight:700;margin-bottom:5px;"><i class="fas fa-exclamation-triangle"></i> Important</div>
-                    No advance deposit = No room approval. Your reservation is only confirmed after admin verifies your GCash payment. Monthly rent is also ₱1,300.
-                </div>
-                <a href="<?= APP_URL ?>/auth/register.php" class="btn btn-primary btn-full btn-lg"><i class="fas fa-user-plus"></i> Create Account & Book Now</a>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- ── CTA ── -->
 <section style="background:linear-gradient(135deg,rgba(201,168,76,.1) 0%,transparent 60%);border-top:1px solid var(--border);padding:64px 40px;text-align:center;">
     <h2 style="font-family:var(--font-display);font-size:1.9rem;color:var(--white);margin-bottom:12px;">Ready to Move In?</h2>
-    <p style="color:var(--muted);max-width:400px;margin:0 auto 28px;font-size:.88rem;">Create your account, choose your bed, send ₱1,300 via GCash — and you're in!</p>
+    <p style="color:var(--muted);max-width:400px;margin:0 auto 28px;font-size:.88rem;">Create your account, choose your bed, and start your comfortable stay with us.</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
         <a href="<?= APP_URL ?>/auth/register.php" class="btn btn-primary btn-lg"><i class="fas fa-user-plus"></i> Create Account</a>
         <a href="<?= APP_URL ?>/auth/login.php"    class="btn btn-outline btn-lg"><i class="fas fa-sign-in-alt"></i> Sign In</a>
@@ -217,7 +169,7 @@ try {
             <div class="dev-card" style="text-align:left;">
                 <div style="font-family:var(--font-display);font-size:.9rem;color:var(--white);margin-bottom:14px;"><i class="fas fa-code" style="color:var(--gold);margin-right:7px;"></i>Tech Stack</div>
                 <div style="display:flex;flex-wrap:wrap;gap:7px;">
-                    <?php foreach (['PHP 8','PostgreSQL 15','HTML5','CSS3','JS ES6','Chart.js','PDO','BCrypt','GCash QR','Apache'] as $t): ?>
+                    <?php foreach (['PHP 8','PostgreSQL 15','HTML5','CSS3','JS ES6','Chart.js','PDO','BCrypt','Apache'] as $t): ?>
                     <span class="tech-badge"><?= $t ?></span>
                     <?php endforeach; ?>
                 </div>
@@ -225,7 +177,7 @@ try {
             <div class="dev-card" style="text-align:left;">
                 <div style="font-family:var(--font-display);font-size:.9rem;color:var(--white);margin-bottom:14px;"><i class="fas fa-star" style="color:var(--gold);margin-right:7px;"></i>System Features</div>
                 <ul style="list-style:none;display:grid;gap:6px;">
-                    <?php foreach (['18 Rooms · 72 Beds · 3 Floors','GCash payment integration','Admin announcement system','Real-time occupancy charts','Printable payment receipts','Profile photo uploads','Maintenance mode lockdown','PostgreSQL advanced features'] as $f): ?>
+                    <?php foreach (['18 Rooms · 72 Beds · 3 Floors','Admin announcement system','Real-time occupancy charts','Printable payment receipts','Profile photo uploads','Maintenance mode lockdown','PostgreSQL advanced features'] as $f): ?>
                     <li style="font-size:.76rem;color:var(--muted);display:flex;gap:6px;"><i class="fas fa-check" style="color:var(--gold);margin-top:3px;"></i><?= $f ?></li>
                     <?php endforeach; ?>
                 </ul>
