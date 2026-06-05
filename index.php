@@ -194,7 +194,7 @@ try {
 <!-- ── Footer ── -->
 <footer style="background:var(--bg);border-top:1px solid var(--border);padding:24px 40px;text-align:center;color:var(--muted);font-size:.78rem;">
     <p>© <?= date('Y') ?> <strong style="color:var(--white);">Nadelas Boarding House</strong> · All Rights Reserved</p>
-    <p style="margin-top:6px;">Developed by <a href="https://www.facebook.com/cris.danoy.7/" target="_blank" style="color:var(--gold);">Cris Danoy</a> · Version 3.0 ·
+    <p style="margin-top:6px;">Developed by <a href="https://www.facebook.com/cris.danoy.7/" target="_blank" style="color:var(--gold);">Cris Danoy</a> ·
     <a href="<?= APP_URL ?>/auth/login.php" style="color:var(--gold);">Admin Login</a></p>
 </footer>
 
