@@ -42,6 +42,12 @@ try {
         <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dk));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;font-weight:900;color:#05050d;flex-shrink:0;">NBH</div>
         <span>Nadelas Boarding House</span>
     </div>
+
+    <!-- Mobile menu toggle button -->
+    <button class="nav-toggle" id="publicNavToggle" aria-label="Menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <ul class="public-nav-links">
         <li><a href="#features">Features</a></li>
         <li><a href="#rules">Rules</a></li>
