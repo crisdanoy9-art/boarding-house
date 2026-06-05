@@ -24,6 +24,50 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ── Active link highlighting based on scroll position ──
+    function setActiveNavLink() {
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.public-nav-links li a');
+        let currentSection = '';
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100; // offset for sticky header
+            const sectionBottom = sectionTop + section.offsetHeight;
+            if (window.scrollY >= sectionTop && window.scrollY < sectionBottom) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+            if (href && href.substring(1) === currentSection) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', setActiveNavLink);
+    window.addEventListener('load', setActiveNavLink);
+
+    // Also add click handling to manually update active link and smooth scroll
+    document.querySelectorAll('.public-nav-links li a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('href');
+            if (targetId && targetId.startsWith('#')) {
+                e.preventDefault();
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Update URL hash without jumping
+                    history.pushState(null, null, targetId);
+                    // Manually update active class after a short delay
+                    setTimeout(() => setActiveNavLink(), 100);
+                }
+            }
+        });
+    });
 });
 
 // ── Flash auto-dismiss ──
