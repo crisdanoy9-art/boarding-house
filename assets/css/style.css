@@ -867,14 +867,6 @@ select.form-control {
 .info-banner    { background:rgba(56,189,248,.07); border:1px solid rgba(56,189,248,.18); border-radius:var(--r-md); padding:13px 17px; display:flex; align-items:flex-start; gap:10px; font-size:.85rem; color:var(--info); margin-bottom:18px; }
 .warning-banner { background:rgba(240,168,50,.07); border:1px solid rgba(240,168,50,.18); border-radius:var(--r-md); padding:13px 17px; display:flex; align-items:flex-start; gap:10px; font-size:.85rem; color:var(--warning); margin-bottom:18px; }
 
-/* Public nav */
-.public-nav { display:flex; align-items:center; padding:16px 36px; background:rgba(8,8,16,.94); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; gap:8px; }
-.public-nav-logo { font-family:var(--font-display); font-size:1.3rem; color:var(--gold); display:flex; align-items:center; gap:10px; }
-.public-nav-links { list-style:none; display:flex; gap:4px; margin-left:28px; }
-.public-nav-links a { color:var(--muted); font-size:.86rem; font-weight:500; padding:7px 13px; border-radius:var(--r-md); transition:var(--t); }
-.public-nav-links a:hover { color:var(--gold); background:var(--gold-subtle); }
-.public-nav-actions { margin-left:auto; display:flex; gap:10px; }
-
 /* Hero */
 .hero { min-height:88vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:80px 36px; position:relative; overflow:hidden; }
 .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(201,168,76,.13) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 20% 20%,rgba(201,168,76,.06) 0%,transparent 50%); }
@@ -926,8 +918,6 @@ select.form-control {
   .nav-toggle { display:flex; }
   .tenant-nav { position:relative; }
   .hero { padding:50px 20px; }
-  .public-nav { padding:14px 20px; }
-  .public-nav-links { display:none; }
   .dev-grid { grid-template-columns:1fr 1fr; }
 }
 
@@ -1141,7 +1131,7 @@ select.form-control {
 .dev-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-xl); padding:26px; text-align:center; transition:var(--t-lg); }
 .dev-card:hover { border-color:rgba(201,168,76,.35); transform:translateY(-4px); box-shadow:var(--shadow-gold); }
 
-/* ── Public Navbar (centered links) ── */
+/* ── Public Navbar (centered links) WITH BIGGER TEXT, BETTER HOVER, ACTIVE STATE ── */
 .public-nav {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -1170,25 +1160,36 @@ select.form-control {
   list-style: none;
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   margin: 0;
   padding: 0;
 }
 
 .public-nav-links li a {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: var(--r-md);
-  transition: var(--t);
+  transition: all 0.25s ease;
   text-decoration: none;
   white-space: nowrap;
+  display: inline-block;
 }
 
 .public-nav-links li a:hover {
   color: var(--gold);
-  background: var(--gold-subtle);
+  background: rgba(201, 168, 76, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Active link – when the section is in view or manually clicked */
+.public-nav-links li a.active {
+  color: var(--gold);
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.18), rgba(201, 168, 76, 0.06));
+  border-bottom: 2px solid var(--gold);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(201, 168, 76, 0.2);
 }
 
 .public-nav-actions {
@@ -1214,7 +1215,7 @@ select.form-control {
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     padding: 16px;
-    gap: 8px;
+    gap: 12px;
     z-index: 99;
   }
   .public-nav-links.open {
@@ -1223,6 +1224,8 @@ select.form-control {
   .public-nav-links li a {
     text-align: center;
     display: block;
+    font-size: 1rem;
+    padding: 12px;
   }
   .public-nav-actions {
     grid-column: 2;
