@@ -1140,3 +1140,92 @@ select.form-control {
 .dev-section { background:var(--bg2); border-top:1px solid var(--border); padding:68px 40px; }
 .dev-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-xl); padding:26px; text-align:center; transition:var(--t-lg); }
 .dev-card:hover { border-color:rgba(201,168,76,.35); transform:translateY(-4px); box-shadow:var(--shadow-gold); }
+
+/* ── Public Navbar (centered links) ── */
+.public-nav {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 12px 36px;
+  background: rgba(8, 8, 16, 0.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.public-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.public-nav-links {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.public-nav-links li a {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--r-md);
+  transition: var(--t);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.public-nav-links li a:hover {
+  color: var(--gold);
+  background: var(--gold-subtle);
+}
+
+.public-nav-actions {
+  display: flex;
+  gap: 10px;
+  justify-self: end;
+}
+
+/* Mobile */
+@media (max-width: 860px) {
+  .public-nav {
+    grid-template-columns: auto auto;
+    padding: 12px 20px;
+  }
+  .public-nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    background: rgba(8, 8, 16, 0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+    gap: 8px;
+    z-index: 99;
+  }
+  .public-nav-links.open {
+    display: flex;
+  }
+  .public-nav-links li a {
+    text-align: center;
+    display: block;
+  }
+  .public-nav-actions {
+    grid-column: 2;
+    justify-self: end;
+  }
+}

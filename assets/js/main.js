@@ -12,6 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initFormValidation();
     initTableSearch();
     if (document.getElementById('occupancyChart')) initCharts();
+
+    // ── Public mobile nav toggle ──
+    const pubToggle = document.getElementById('publicNavToggle');
+    const pubLinks = document.querySelector('.public-nav-links');
+    if (pubToggle && pubLinks) {
+        pubToggle.addEventListener('click', () => pubLinks.classList.toggle('open'));
+        document.addEventListener('click', (e) => {
+            if (!pubToggle.contains(e.target) && !pubLinks.contains(e.target)) {
+                pubLinks.classList.remove('open');
+            }
+        });
+    }
 });
 
 // ── Flash auto-dismiss ──
