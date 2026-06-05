@@ -194,28 +194,6 @@ UPDATE rooms SET status = 'available' WHERE id NOT IN (
     SELECT DISTINCT room_id FROM beds WHERE status IN ('occupied', 'reserved')
 );
 
--- Sample reservations
-INSERT INTO reservations (user_id, room_id, bed_id, move_in_date, status) VALUES
-(2, 1, 1, '2025-01-01', 'approved'),
-(3, 1, 2, '2025-01-15', 'approved'),
-(4, 7, 1, '2025-02-01', 'approved'),
-(5, 3, 9, '2025-03-01', 'pending');
-
--- Sample tenants
-INSERT INTO tenants (user_id, room_id, bed_id, reservation_id, move_in_date, status) VALUES
-(2, 1, 1, 1, '2025-01-01', 'active'),
-(3, 1, 2, 2, '2025-01-15', 'active'),
-(4, 7, (SELECT id FROM beds WHERE room_id = 7 AND bed_number = 1), 3, '2025-02-01', 'active');
-
--- Sample payments
-INSERT INTO payments (tenant_id, amount, payment_date, due_date, payment_month, payment_method, status, recorded_by) VALUES
-(1, 2500.00, '2025-01-01', '2025-01-05', '2025-01', 'cash', 'paid', 1),
-(1, 2500.00, '2025-02-02', '2025-02-05', '2025-02', 'gcash', 'paid', 1),
-(1, 2500.00, '2025-03-03', '2025-03-05', '2025-03', 'cash', 'paid', 1),
-(2, 2500.00, '2025-01-15', '2025-01-20', '2025-01', 'cash', 'paid', 1),
-(2, 2500.00, '2025-02-14', '2025-02-20', '2025-02', 'bank_transfer', 'paid', 1),
-(3, 2800.00, '2025-02-01', '2025-02-05', '2025-02', 'gcash', 'paid', 1),
-(3, 2800.00, '2025-03-01', '2025-03-05', '2025-03', 'cash', 'pending', 1);
 
 -- ============================================================
 -- NADELAS BOARDING HOUSE — DATABASE ADDITIONS v3.0
