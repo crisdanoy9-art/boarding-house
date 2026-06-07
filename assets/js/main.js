@@ -68,6 +68,49 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // ── Tenant sidebar toggle (collapsible + mobile overlay) ──
+    const tenantSidebar = document.getElementById('tenantSidebar');
+    const tenantToggle = document.getElementById('tenantSidebarToggle');
+    const tenantMainWrapper = document.getElementById('tenantMainWrapper');
+    let sidebarOverlay = document.querySelector('.sidebar-overlay');
+    if (!sidebarOverlay) {
+        sidebarOverlay = document.createElement('div');
+        sidebarOverlay.className = 'sidebar-overlay';
+        document.body.appendChild(sidebarOverlay);
+    }
+
+    if (tenantSidebar && tenantToggle) {
+        // Restore collapsed state on desktop
+        const collapsed = localStorage.getItem('tenantSidebarCollapsed') === 'true';
+        if (collapsed && window.innerWidth > 860) {
+            tenantSidebar.classList.add('collapsed');
+        }
+        tenantToggle.addEventListener('click', () => {
+            if (window.innerWidth > 860) {
+                // Desktop: toggle collapsed state
+                tenantSidebar.classList.toggle('collapsed');
+                localStorage.setItem('tenantSidebarCollapsed', tenantSidebar.classList.contains('collapsed'));
+            } else {
+                // Mobile: slide sidebar in/out
+                tenantSidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('show');
+            }
+        });
+        sidebarOverlay.addEventListener('click', () => {
+            tenantSidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('show');
+        });
+        // Close sidebar when a nav link is clicked (mobile)
+        tenantSidebar.querySelectorAll('.nav-link, .logout-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 860) {
+                    tenantSidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('show');
+                }
+            });
+        });
+    }
 });
 
 // ── Flash auto-dismiss ──
@@ -127,7 +170,7 @@ function initSidebar() {
     });
 }
 
-// ── Tenant mobile nav ──
+// ── Tenant mobile nav (old top navbar, kept for compatibility if needed) ──
 function initMobileNav() {
     const toggle = document.getElementById('navToggle');
     const links  = document.getElementById('navLinks');
