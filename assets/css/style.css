@@ -1232,3 +1232,249 @@ select.form-control {
     justify-self: end;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   TENANT SIDEBAR (replaces top navbar)
+   ═══════════════════════════════════════════════════════════ */
+.tenant-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 100vh;
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.tenant-sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tenant-sidebar .nbh-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dk));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #05050d;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(201,168,76,.15), var(--shadow-gold);
+}
+
+.tenant-sidebar .sidebar-brand {
+  flex: 1;
+  overflow: hidden;
+}
+
+.tenant-sidebar .sidebar-brand-name {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tenant-sidebar .sidebar-brand-sub {
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.tenant-sidebar .sidebar-toggle {
+  background: none;
+  border: none;
+  color: var(--muted);
+  padding: 6px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: var(--t);
+  flex-shrink: 0;
+}
+.tenant-sidebar .sidebar-toggle:hover {
+  color: var(--gold);
+  background: var(--gold-subtle);
+}
+
+.tenant-sidebar .sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tenant-sidebar .user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dk));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #08080f;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.tenant-sidebar .user-info {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+.tenant-sidebar .user-name {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tenant-sidebar .user-role {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.tenant-sidebar .sidebar-nav {
+  list-style: none;
+  padding: 12px 10px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.tenant-sidebar .nav-item {
+  margin-bottom: 2px;
+}
+
+.tenant-sidebar .nav-link,
+.tenant-sidebar .logout-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 13px;
+  border-radius: var(--r-md);
+  color: var(--muted);
+  font-size: 0.87rem;
+  font-weight: 500;
+  transition: var(--t);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+}
+.tenant-sidebar .nav-link i,
+.tenant-sidebar .logout-link i {
+  width: 18px;
+  font-size: 0.92rem;
+}
+.tenant-sidebar .nav-link:hover {
+  color: var(--gold);
+  background: var(--gold-subtle);
+  border-color: rgba(201,168,76,.1);
+}
+.tenant-sidebar .nav-item.active .nav-link {
+  color: var(--gold);
+  background: linear-gradient(135deg, rgba(201,168,76,.14), rgba(201,168,76,.04));
+  border-color: rgba(201,168,76,.2);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+.tenant-sidebar .logout-link:hover {
+  background: rgba(240,82,82,.1);
+  color: var(--danger);
+}
+
+/* Collapsed sidebar */
+.tenant-sidebar.collapsed {
+  width: 70px;
+}
+.tenant-sidebar.collapsed .sidebar-brand,
+.tenant-sidebar.collapsed .user-info,
+.tenant-sidebar.collapsed .nav-link span,
+.tenant-sidebar.collapsed .logout-link span {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+.tenant-sidebar.collapsed .nav-link,
+.tenant-sidebar.collapsed .logout-link {
+  justify-content: center;
+}
+.tenant-sidebar.collapsed .sidebar-toggle i {
+  transform: rotate(180deg);
+}
+
+/* Main wrapper */
+.tenant-main-wrapper {
+  margin-left: 260px;
+  min-height: 100vh;
+  background: var(--bg);
+  transition: margin-left 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tenant-sidebar.collapsed + .tenant-main-wrapper {
+  margin-left: 70px;
+}
+
+.announcements-container {
+  padding: 16px 24px 0;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.tenant-content {
+  padding: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* Mobile: transform sidebar instead of margin */
+@media (max-width: 860px) {
+  .tenant-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    z-index: 210;
+  }
+  .tenant-sidebar.open {
+    transform: translateX(0);
+  }
+  .tenant-main-wrapper {
+    margin-left: 0 !important;
+  }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 205;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+}
