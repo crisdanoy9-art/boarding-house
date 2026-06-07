@@ -7,9 +7,6 @@ $db  = getDB();
 $uid = $_SESSION['user_id'];
 $errors = [];
 
-define('GCASH_NUMBER', '09633951825');
-define('GCASH_NAME',   'Cris Danoy');
-
 $existing = $db->prepare("SELECT id FROM bh.tenants WHERE user_id=? AND status='active'");
 $existing->execute([$uid]); $existingTenancy = $existing->fetch();
 
@@ -24,11 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $roomId   = (int)$_POST['room_id'];
         $bedId    = (int)$_POST['bed_id'];
         $moveIn   = sanitizeInput($_POST['move_in_date'] ?? '');
-        $gcashRef = sanitizeInput($_POST['gcash_reference'] ?? '');
         $notes    = sanitizeInput($_POST['notes'] ?? '');
 
         if (!$roomId || !$bedId || !$moveIn) { $errors[] = 'Please select a room, bed, and move-in date.'; }
-        elseif (strlen($gcashRef) < 8) { $errors[] = 'GCash reference number is required (min. 8 characters). Please send ₱1,300 first.'; }
         elseif (strtotime($moveIn) < strtotime('today')) { $errors[] = 'Move-in date cannot be in the past.'; }
         else {
             try {
@@ -37,11 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $bc->execute([$bedId,$roomId]);
                 if (!$bc->fetch()) throw new Exception('That bed is no longer available. Please pick another.');
 
-                $fullNotes = "GCASH_REF: {$gcashRef}".($notes?" | {$notes}":'');
-                $db->prepare("INSERT INTO bh.reservations(user_id,room_id,bed_id,move_in_date,notes,status,created_at) VALUES(?,?,?,?,?,'pending',NOW())")->execute([$uid,$roomId,$bedId,$moveIn,$fullNotes]);
-                $db->prepare("UPDATE bh.beds SET status='reserved',tenant_id=? WHERE id=?")->execute([$uid,$bedId]);
+                $db->prepare("INSERT INTO bh.reservations(user_id,room_id,bed_id,move_in_date,notes,status,created_at) VALUES(?,?,?,?,?,'pending',NOW())")->execute([$uid,$roomId,$bedId,$moveIn,$notes]);
+                $db->prepare("UPDATE bh.beds SET status='reserved' WHERE id=?")->execute([$bedId]);
                 $db->commit();
-                redirect(APP_URL.'/user/reservations.php','✅ Reservation submitted! GCash ref #'.$gcashRef.' noted. Admin will verify and approve.','success');
+                redirect(APP_URL.'/user/reservations.php','✅ Reservation submitted! Admin will review and approve.','success');
             } catch (Exception $e) { $db->rollBack(); $errors[] = $e->getMessage(); }
         }
     }
@@ -78,9 +72,9 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
 <!-- Booking Flow Steps -->
 <?php if (!$existingTenancy && !$pendingRes): ?>
 <div style="display:flex;align-items:center;gap:0;margin-bottom:22px;overflow:hidden;">
-    <?php foreach ([['1','Select Bed'],['2','Pay GCash'],['3','Submit Ref'],['4','Admin Approves']] as $i=>[$n,$lbl]): ?>
+    <?php foreach ([['1','Select Bed'],['2','Submit Details'],['3','Admin Approves']] as $i=>[$n,$lbl]): ?>
     <div style="display:flex;flex-direction:column;align-items:center;flex:1;position:relative;">
-        <?php if($i<3): ?><div style="position:absolute;top:17px;left:50%;right:-50%;height:2px;background:var(--border2);z-index:0;"></div><?php endif; ?>
+        <?php if($i<2): ?><div style="position:absolute;top:17px;left:50%;right:-50%;height:2px;background:var(--border2);z-index:0;"></div><?php endif; ?>
         <div style="width:34px;height:34px;border-radius:50%;background:<?= $i===0?'var(--gold)':'var(--surface2)' ?>;border:2px solid <?= $i===0?'var(--gold)':'var(--border2)' ?>;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:<?= $i===0?'#06060e':'var(--muted)' ?>;z-index:1;position:relative;"><?= $n ?></div>
         <div style="font-size:.66rem;color:<?= $i===0?'var(--gold)':'var(--muted)' ?>;margin-top:5px;text-align:center;"><?= $lbl ?></div>
     </div>
@@ -88,25 +82,10 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
 </div>
 <?php endif; ?>
 
-<!-- Deposit notice -->
-<?php if (!$existingTenancy && !$pendingRes): ?>
-<div class="deposit-info mb-4">
-    <div class="deposit-info-icon"><i class="fas fa-peso-sign"></i></div>
-    <div class="deposit-info-text">
-        <div class="deposit-info-title">₱1,300 Advance Deposit via GCash Required</div>
-        <div class="deposit-info-sub">Send <strong>₱1,300</strong> to GCash <strong><?= GCASH_NUMBER ?></strong> (<?= GCASH_NAME ?>) first. Enter the reference number when submitting. No payment = no reservation approval.</div>
-    </div>
-    <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:var(--font-display);font-size:1.4rem;color:var(--gold);">₱1,300</div>
-        <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;">deposit</div>
-    </div>
-</div>
-<?php endif; ?>
-
 <div class="d-flex align-center justify-between mb-3">
     <div>
         <h2 style="font-family:var(--font-display);font-size:1.4rem;color:var(--white);">Available Rooms</h2>
-        <p style="color:var(--muted);font-size:.82rem;">Click a green bed to select it, then enter your GCash reference</p>
+        <p style="color:var(--muted);font-size:.82rem;">Click a green bed to select it, then submit your reservation.</p>
     </div>
 </div>
 
@@ -166,20 +145,15 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
                 </div>
                 <?php endforeach; ?>
             </div>
-            <div style="font-size:.72rem;color:var(--muted);">
-                <i class="fas fa-info-circle" style="color:var(--gold);"></i>
-                GCash deposit: <strong style="color:var(--gold);">₱1,300</strong> to <?= GCASH_NUMBER ?>
-            </div>
         </div>
     </div>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
 
-<!-- ══ Booking Overlay Modal ══ -->
+<!-- Booking Overlay Modal (simplified, no GCash) -->
 <div class="booking-overlay" id="bookingOverlay">
 <div class="booking-panel">
-    <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);">
         <div>
             <div style="font-family:var(--font-display);font-size:1.05rem;color:var(--white);">Complete Your Booking</div>
@@ -189,58 +163,22 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
     </div>
 
     <div style="padding:20px 22px;">
-        <!-- Step 1: GCash -->
-        <div class="gcash-card mb-4">
-            <div style="font-size:.62rem;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px;position:relative;z-index:1;">Step 1 — Send Advance Deposit</div>
-            <div class="gcash-logo" style="position:relative;z-index:1;">G<span>Cash</span></div>
-            <div class="gcash-qr-box" style="position:relative;z-index:1;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=155x155&data=<?= urlencode('GCash|'.GCASH_NUMBER.'|'.GCASH_NAME) ?>&bgcolor=ffffff&color=000000&margin=4"
-                     alt="GCash QR" width="155" height="155">
-            </div>
-            <div class="gcash-number" style="position:relative;z-index:1;"><?= GCASH_NUMBER ?></div>
-            <div class="gcash-name-sub" style="position:relative;z-index:1;"><?= GCASH_NAME ?> · Nadelas Boarding House</div>
-            <div class="gcash-amount" style="position:relative;z-index:1;"><i class="fas fa-peso-sign"></i> Send exactly ₱1,300.00</div>
-        </div>
-
-        <!-- Instructions -->
-        <div style="background:rgba(240,168,50,.07);border:1px solid rgba(240,168,50,.2);border-radius:var(--r-md);padding:13px 16px;margin-bottom:18px;font-size:.8rem;">
-            <div style="color:var(--warning);font-weight:700;margin-bottom:7px;"><i class="fas fa-exclamation-triangle"></i> Before submitting:</div>
-            <ul style="list-style:none;display:grid;gap:5px;color:var(--muted);">
-                <li><i class="fas fa-check" style="color:var(--gold);margin-right:5px;"></i>Open GCash → Send Money → <?= GCASH_NUMBER ?></li>
-                <li><i class="fas fa-check" style="color:var(--gold);margin-right:5px;"></i>Amount: <strong style="color:var(--white);">₱1,300.00 exactly</strong></li>
-                <li><i class="fas fa-check" style="color:var(--gold);margin-right:5px;"></i>Copy your GCash <strong style="color:var(--white);">Reference Number</strong> after sending</li>
-                <li><i class="fas fa-check" style="color:var(--gold);margin-right:5px;"></i>Enter it below — admin will verify before approving</li>
-            </ul>
-        </div>
-
-        <!-- Step 2: Form -->
-        <div style="font-size:.63rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:12px;">Step 2 — Submit Reservation Details</div>
-
         <form method="POST" action="" data-validate id="bookingForm">
             <?= csrfField() ?>
             <input type="hidden" name="room_id" id="formRoomId">
             <input type="hidden" name="bed_id"  id="formBedId">
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                <div class="form-group">
-                    <label class="form-label">GCash Reference No. *</label>
-                    <div class="input-group">
-                        <i class="fas fa-hashtag input-icon"></i>
-                        <input type="text" name="gcash_reference" id="gcashRefInput"
-                               class="form-control" placeholder="e.g. 1234567890"
-                               required minlength="8"
-                               style="padding-left:38px;font-family:monospace;font-weight:700;letter-spacing:.04em;">
-                    </div>
-                    <div class="form-hint">From your GCash receipt</div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Move-In Date *</label>
-                    <input type="date" name="move_in_date" id="formMoveIn" class="form-control"
-                           min="<?= date('Y-m-d') ?>" value="<?= date('Y-m-d', strtotime('+1 day')) ?>" required>
-                </div>
+            <div class="form-group">
+                <label class="form-label">Move-In Date *</label>
+                <input type="date" name="move_in_date" id="formMoveIn" class="form-control"
+                       min="<?= date('Y-m-d') ?>" value="<?= date('Y-m-d', strtotime('+1 day')) ?>" required>
             </div>
 
-            <!-- Summary -->
+            <div class="form-group">
+                <label class="form-label">Additional Notes (optional)</label>
+                <textarea name="notes" class="form-control" rows="3" placeholder="Any special requests or information for admin..."></textarea>
+            </div>
+
             <div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:var(--r-md);padding:13px 16px;margin-bottom:16px;">
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:.8rem;">
                     <div><div style="color:var(--muted);margin-bottom:2px;">Room</div><div style="color:var(--white);font-weight:600;">F<span id="sumFloor">—</span> · Rm <span id="sumRoom">—</span></div></div>
@@ -251,7 +189,7 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <button type="button" onclick="closeBooking()" class="btn btn-ghost">Cancel</button>
-                <button type="submit" class="btn btn-primary" onclick="return validateRef()">
+                <button type="submit" class="btn btn-primary">
                     <i class="fas fa-paper-plane"></i> Submit Reservation
                 </button>
             </div>
@@ -280,21 +218,11 @@ function selectBed(el) {
     const overlay = document.getElementById('bookingOverlay');
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('gcashRefInput')?.focus(), 400);
 }
 function closeBooking() {
     document.getElementById('bookingOverlay').classList.remove('open');
     document.body.style.overflow = '';
     if (selBedEl) { selBedEl.style.outline=''; selBedEl.style.boxShadow=''; selBedEl=null; }
-}
-function validateRef() {
-    const r = document.getElementById('gcashRefInput').value.trim();
-    if (!r || r.length < 8) {
-        document.getElementById('gcashRefInput').style.borderColor = 'var(--danger)';
-        document.getElementById('gcashRefInput').focus();
-        return false;
-    }
-    return true;
 }
 document.getElementById('bookingOverlay').addEventListener('click', function(e) { if(e.target===this) closeBooking(); });
 </script>
