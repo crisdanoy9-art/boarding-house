@@ -47,25 +47,10 @@ if ($tenancy) {
         if ($p['status']==='pending') $pendingDue   += $p['amount'];
     }
     // Count overdue months
-    $overdueMonths = (int)$db->prepare("SELECT COUNT(*) FROM bh.payments WHERE tenant_id=? AND status='overdue'")->execute([$tenancy['id']]) ? 
-        $db->prepare("SELECT COUNT(*) FROM bh.payments WHERE tenant_id=? AND status='overdue'")->execute([$tenancy['id']]) : 0;
     $oStmt = $db->prepare("SELECT COUNT(*) FROM bh.payments WHERE tenant_id=? AND status='overdue'");
     $oStmt->execute([$tenancy['id']]);
     $overdueMonths = (int)$oStmt->fetchColumn();
 }
-
-// Announcements for tenants
-$announcements = [];
-try {
-    $annStmt = $db->prepare("
-        SELECT * FROM bh.announcements
-        WHERE is_active=TRUE AND (expires_at IS NULL OR expires_at > NOW())
-        AND audience IN ('all','tenants')
-        ORDER BY created_at DESC LIMIT 6
-    ");
-    $annStmt->execute();
-    $announcements = $annStmt->fetchAll();
-} catch (Exception $e) {}
 
 // Settings
 function getS($db,$key,$def=''){try{$s=$db->prepare("SELECT value FROM bh.system_settings WHERE key=?");$s->execute([$key]);$r=$s->fetch();return $r?$r['value']:$def;}catch(Exception $e){return $def;}}
@@ -104,27 +89,6 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
         </div>
     </div>
     <a href="<?= APP_URL ?>/user/payments.php" class="btn btn-sm btn-danger" style="flex-shrink:0;">Settle Now</a>
-</div>
-<?php endif; ?>
-
-<!-- Announcements -->
-<?php if (!empty($announcements)): ?>
-<div style="margin-bottom:22px;">
-    <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:12px;">
-        <i class="fas fa-bullhorn" style="color:var(--gold);"></i> Announcements
-    </div>
-    <?php
-    $typeMap=['info'=>'ann-info','warning'=>'ann-warning','danger'=>'ann-danger','success'=>'ann-success','gold'=>'ann-gold'];
-    foreach ($announcements as $ann): ?>
-    <div class="announcement-card <?= $typeMap[$ann['type']]??'ann-info' ?>" style="margin-bottom:8px;">
-        <div class="ann-icon"><i class="fas fa-<?= e($ann['icon']) ?>"></i></div>
-        <div style="flex:1;">
-            <div class="ann-title"><?= e($ann['title']) ?></div>
-            <div class="ann-body"><?= e($ann['body']) ?></div>
-            <div class="ann-date"><?= formatDate($ann['created_at'],'M d, Y') ?></div>
-        </div>
-    </div>
-    <?php endforeach; ?>
 </div>
 <?php endif; ?>
 
