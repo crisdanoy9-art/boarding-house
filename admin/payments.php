@@ -42,18 +42,44 @@ if ($statusFilter) $where .= " AND p.status='$statusFilter'";
 
 $total  = $db->query("SELECT COUNT(*) FROM bh.payments p $where")->fetchColumn();
 $pager  = paginate($total,$perPage,$page);
-$payments = $db->query("
+
+// Fixed query: join tenants -> beds -> rooms
+$payments = $db->prepare("
     SELECT p.*, u.name AS tenant_name, r.room_number, f.floor_number
     FROM bh.payments p
-    JOIN bh.tenants t ON t.id=p.tenant_id
-    JOIN bh.users u   ON u.id=t.user_id
-    JOIN bh.rooms r   ON r.id=t.room_id
-    JOIN bh.floors f  ON f.id=r.floor_id
-    $where ORDER BY p.payment_date DESC LIMIT $perPage OFFSET {$pager['offset']}
+    JOIN bh.tenants t ON t.id = p.tenant_id
+    JOIN bh.users u   ON u.id = t.user_id
+    JOIN bh.beds b    ON b.id = t.bed_id
+    JOIN bh.rooms r   ON r.id = b.room_id
+    JOIN bh.floors f  ON f.id = r.floor_id
+    $where 
+    ORDER BY p.payment_date DESC 
+    LIMIT :limit OFFSET :offset
+");
+$payments->bindValue(':limit', $perPage, PDO::PARAM_INT);
+$payments->bindValue(':offset', $pager['offset'], PDO::PARAM_INT);
+$payments->execute();
+$payments = $payments->fetchAll();
+
+// Fixed active tenants query: tenants -> beds -> rooms
+$activeTenants = $db->query("
+    SELECT t.id, u.name, r.room_number, f.floor_number, r.price
+    FROM bh.tenants t
+    JOIN bh.users u ON u.id = t.user_id
+    JOIN bh.beds b ON b.id = t.bed_id
+    JOIN bh.rooms r ON r.id = b.room_id
+    JOIN bh.floors f ON f.id = r.floor_id
+    WHERE t.status = 'active'
+    ORDER BY u.name
 ")->fetchAll();
 
-$activeTenants = $db->query("SELECT t.id,u.name,r.room_number,f.floor_number,r.price FROM bh.tenants t JOIN bh.users u ON u.id=t.user_id JOIN bh.rooms r ON r.id=t.room_id JOIN bh.floors f ON f.id=r.floor_id WHERE t.status='active' ORDER BY u.name")->fetchAll();
-$summary = $db->query("SELECT SUM(CASE WHEN status='paid' THEN amount ELSE 0 END) AS total_paid, SUM(CASE WHEN status='pending' THEN amount ELSE 0 END) AS total_pending, SUM(CASE WHEN status='overdue' THEN amount ELSE 0 END) AS total_overdue FROM bh.payments p $where")->fetch();
+$summary = $db->query("
+    SELECT 
+        SUM(CASE WHEN status='paid' THEN amount ELSE 0 END) AS total_paid,
+        SUM(CASE WHEN status='pending' THEN amount ELSE 0 END) AS total_pending,
+        SUM(CASE WHEN status='overdue' THEN amount ELSE 0 END) AS total_overdue
+    FROM bh.payments p $where
+")->fetch();
 ?>
 <?php include __DIR__ . '/../includes/header.php'; ?>
 <?php include __DIR__ . '/../includes/admin_nav.php'; ?>
