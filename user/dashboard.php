@@ -163,8 +163,9 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
     </div>
 </div>
 
+<!-- Two-column grid: My Room (left) and Contact Us (right) -->
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px;">
-    <!-- Room details -->
+    <!-- My Room card (left) -->
     <div class="card">
         <div class="card-header">
             <span class="card-title"><i class="fas fa-home" style="color:var(--gold);font-size:.85rem;"></i> My Room</span>
@@ -205,31 +206,34 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
         </div>
     </div>
 
-    <!-- Recent reservations -->
+    <!-- Contact Us card (right) – moved from its previous centered position -->
     <div class="card">
         <div class="card-header">
-            <span class="card-title"><i class="fas fa-calendar-check" style="color:var(--gold);font-size:.85rem;"></i> Reservations</span>
-            <a href="<?= APP_URL ?>/user/reservations.php" class="btn btn-sm btn-ghost">All</a>
+            <span class="card-title"><i class="fas fa-headset" style="color:var(--gold);font-size:.85rem;"></i> Contact Us</span>
+            <span class="badge badge-success" style="font-size:.65rem;"><i class="fas fa-circle" style="font-size:.4rem;"></i> Available</span>
         </div>
-        <?php if (empty($reservations)): ?>
-        <div class="empty-state" style="padding:28px;"><i class="fas fa-calendar-times"></i><h3>No Reservations</h3></div>
-        <?php else: ?>
-        <?php foreach ($reservations as $res):
-            $bm=['pending'=>'warning','approved'=>'success','rejected'=>'danger','cancelled'=>'muted']; ?>
-        <div style="display:flex;align-items:center;gap:12px;padding:13px 22px;border-bottom:1px solid rgba(255,255,255,.04);">
-            <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:<?= ['warning'=>'var(--warning)','success'=>'var(--success)','danger'=>'var(--danger)','muted'=>'var(--muted)'][$bm[$res['status']]??'muted'] ?>"></div>
-            <div style="flex:1;min-width:0;">
-                <div style="font-weight:500;color:var(--white);font-size:.86rem;">F<?= $res['floor_number'] ?> Rm<?= e($res['room_number']) ?> Bed<?= $res['bed_number'] ?></div>
-                <div style="font-size:.73rem;color:var(--muted);"><?= formatDate($res['created_at'],'M d, Y') ?></div>
+        <div class="card-body" style="padding:18px 20px;">
+            <p style="color:var(--muted);font-size:.83rem;margin-bottom:16px;">For concerns, maintenance requests, or payment queries:</p>
+            <div style="display:grid;gap:10px;">
+                <a href="tel:<?= e($adminPhone) ?>" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(62,207,110,.06);border:1px solid rgba(62,207,110,.14);border-radius:var(--r-md);color:var(--text);font-size:.85rem;transition:var(--t);"
+                   onmouseover="this.style.borderColor='rgba(62,207,110,.3)'" onmouseout="this.style.borderColor='rgba(62,207,110,.14)'">
+                    <div style="width:32px;height:32px;background:rgba(62,207,110,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-phone" style="color:var(--success);font-size:.85rem;"></i></div>
+                    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Phone / WhatsApp</div><div style="font-weight:600;color:var(--white);"><?= e($adminPhone) ?></div></div>
+                </a>
+                <a href="<?= e($adminFacebook) ?>" target="_blank" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(24,119,242,.06);border:1px solid rgba(24,119,242,.14);border-radius:var(--r-md);color:var(--text);font-size:.85rem;transition:var(--t);">
+                    <div style="width:32px;height:32px;background:rgba(24,119,242,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fab fa-facebook-messenger" style="color:#00b2ff;font-size:.85rem;"></i></div>
+                    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Facebook Messenger</div><div style="font-weight:600;color:var(--white);">Message on Facebook</div></div>
+                </a>
+                <a href="mailto:<?= e($adminEmail) ?>" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.14);border-radius:var(--r-md);color:var(--text);font-size:.85rem;transition:var(--t);">
+                    <div style="width:32px;height:32px;background:rgba(201,168,76,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-envelope" style="color:var(--gold);font-size:.85rem;"></i></div>
+                    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Email</div><div style="font-weight:600;color:var(--white);font-size:.83rem;"><?= e($adminEmail) ?></div></div>
+                </a>
             </div>
-            <span class="badge badge-<?= $bm[$res['status']]??'muted' ?>"><?= ucfirst($res['status']) ?></span>
         </div>
-        <?php endforeach; ?>
-        <?php endif; ?>
     </div>
 </div>
 
-<!-- Recent payments -->
+<!-- Recent payments (if any) -->
 <?php if ($payments && !empty($payments)): ?>
 <div class="card mb-4">
     <div class="card-header">
@@ -257,94 +261,28 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
 </div>
 <?php endif; ?>
 
-<!-- Contact + Quick actions -->
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px;">
-    <!-- Contact -->
+<!-- Reservations card (moved below, centered) -->
+<div style="max-width:620px; margin:0 auto 22px;">
     <div class="card">
         <div class="card-header">
-            <span class="card-title"><i class="fas fa-headset" style="color:var(--gold);font-size:.85rem;"></i> Contact Us</span>
-            <span class="badge badge-success" style="font-size:.65rem;"><i class="fas fa-circle" style="font-size:.4rem;"></i> Available</span>
+            <span class="card-title"><i class="fas fa-calendar-check" style="color:var(--gold);font-size:.85rem;"></i> Reservations</span>
+            <a href="<?= APP_URL ?>/user/reservations.php" class="btn btn-sm btn-ghost">All</a>
         </div>
-        <div class="card-body" style="padding:18px 20px;">
-            <p style="color:var(--muted);font-size:.83rem;margin-bottom:16px;">For concerns, maintenance requests, or payment queries:</p>
-            <div style="display:grid;gap:10px;">
-                <a href="tel:<?= e($adminPhone) ?>" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(62,207,110,.06);border:1px solid rgba(62,207,110,.14);border-radius:var(--r-md);color:var(--text);font-size:.85rem;transition:var(--t);"
-                   onmouseover="this.style.borderColor='rgba(62,207,110,.3)'" onmouseout="this.style.borderColor='rgba(62,207,110,.14)'">
-                    <div style="width:32px;height:32px;background:rgba(62,207,110,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-phone" style="color:var(--success);font-size:.85rem;"></i></div>
-                    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Phone / WhatsApp</div><div style="font-weight:600;color:var(--white);"><?= e($adminPhone) ?></div></div>
-                </a>
-                <a href="<?= e($adminFacebook) ?>" target="_blank" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(24,119,242,.06);border:1px solid rgba(24,119,242,.14);border-radius:var(--r-md);color:var(--text);font-size:.85rem;transition:var(--t);">
-                    <div style="width:32px;height:32px;background:rgba(24,119,242,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fab fa-facebook-messenger" style="color:#00b2ff;font-size:.85rem;"></i></div>
-                    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Facebook Messenger</div><div style="font-weight:600;color:var(--white);">Message on Facebook</div></div>
-                </a>
-                <a href="mailto:<?= e($adminEmail) ?>" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.14);border-radius:var(--r-md);color:var(--text);font-size:.85rem;transition:var(--t);">
-                    <div style="width:32px;height:32px;background:rgba(201,168,76,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-envelope" style="color:var(--gold);font-size:.85rem;"></i></div>
-                    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Email</div><div style="font-weight:600;color:var(--white);font-size:.83rem;"><?= e($adminEmail) ?></div></div>
-                </a>
+        <?php if (empty($reservations)): ?>
+        <div class="empty-state" style="padding:28px;"><i class="fas fa-calendar-times"></i><h3>No Reservations</h3></div>
+        <?php else: ?>
+        <?php foreach ($reservations as $res):
+            $bm=['pending'=>'warning','approved'=>'success','rejected'=>'danger','cancelled'=>'muted']; ?>
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 22px;border-bottom:1px solid rgba(255,255,255,.04);">
+            <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:<?= ['warning'=>'var(--warning)','success'=>'var(--success)','danger'=>'var(--danger)','muted'=>'var(--muted)'][$bm[$res['status']]??'muted'] ?>"></div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:500;color:var(--white);font-size:.86rem;">F<?= $res['floor_number'] ?> Rm<?= e($res['room_number']) ?> Bed<?= $res['bed_number'] ?></div>
+                <div style="font-size:.73rem;color:var(--muted);"><?= formatDate($res['created_at'],'M d, Y') ?></div>
             </div>
+            <span class="badge badge-<?= $bm[$res['status']]??'muted' ?>"><?= ucfirst($res['status']) ?></span>
         </div>
-    </div>
-
-    <!-- Quick actions -->
-    <div style="display:grid;gap:14px;align-content:start;">
-        <div class="card">
-            <div class="card-header"><span class="card-title"><i class="fas fa-bolt" style="color:var(--gold);font-size:.85rem;"></i> Quick Actions</span></div>
-            <div class="card-body" style="padding:14px 18px;display:grid;gap:8px;">
-                <a href="<?= APP_URL ?>/user/payments.php" class="btn btn-primary btn-full">
-                    <i class="fas fa-qrcode"></i> Pay via GCash / Maya
-                </a>
-                <?php if (!$tenancy && !$pendingRes): ?>
-                <a href="<?= APP_URL ?>/user/book_room.php" class="btn btn-outline btn-full">
-                    <i class="fas fa-bed"></i> Book a Room
-                </a>
-                <?php endif; ?>
-                <a href="<?= APP_URL ?>/user/reservations.php" class="btn btn-ghost btn-full"><i class="fas fa-calendar-check"></i> My Reservations</a>
-                <a href="<?= APP_URL ?>/user/profile.php" class="btn btn-ghost btn-full"><i class="fas fa-user-edit"></i> Edit Profile</a>
-            </div>
-        </div>
-        <!-- Payment info box -->
-        <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:var(--r-lg);padding:16px 18px;">
-            <div style="font-size:.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:8px;"><i class="fas fa-info-circle"></i> Payment Policy</div>
-            <div style="font-size:.82rem;color:var(--muted);line-height:1.75;">
-                Rate: <strong style="color:var(--gold);">₱1,300/month</strong><br>
-                Due: <strong style="color:var(--white);">1st of every month</strong><br>
-                Advance deposit: <strong style="color:var(--gold);">₱1,300</strong> on approval<br>
-                <span style="color:var(--danger);">3 months non-payment = auto-vacate</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- House Rules (collapsed) -->
-<div class="card">
-    <div class="card-header" style="cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
-        <span class="card-title"><i class="fas fa-scroll" style="color:var(--gold);font-size:.85rem;"></i> House Rules & Policies</span>
-        <i class="fas fa-chevron-down" style="color:var(--muted);transition:var(--t);" id="rulesChevron"></i>
-    </div>
-    <div style="display:none;" id="rulesBody">
-        <div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
-            <?php
-            $rules = [
-                ['fas fa-volume-mute','Quiet Hours','10:00 PM – 6:00 AM strictly enforced.'],
-                ['fas fa-user-friends','Visitors','Allowed until 9:00 PM only. No overnights.'],
-                ['fas fa-smoking-ban','No Smoking','Strictly prohibited in all areas.'],
-                ['fas fa-calendar-day','Rent Due','₱1,300 due on the 1st of every month.'],
-                ['fas fa-broom','Cleanliness','Keep your area and shared spaces clean.'],
-                ['fas fa-clock','Curfew','Main gate locked at 11:00 PM.'],
-                ['fas fa-paw','No Pets','No pets allowed inside the premises.'],
-                ['fas fa-plug','Electricity','Turn off unused appliances. No high-wattage items.'],
-            ];
-            foreach ($rules as [$icon,$title,$desc]):
-            ?>
-            <div style="display:flex;gap:11px;align-items:flex-start;padding:11px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:var(--r-md);">
-                <div style="width:30px;height:30px;background:rgba(201,168,76,.09);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.8rem;flex-shrink:0;"><i class="<?= $icon ?>"></i></div>
-                <div>
-                    <div style="font-weight:600;color:var(--white);font-size:.83rem;"><?= $title ?></div>
-                    <div style="font-size:.76rem;color:var(--muted);margin-top:2px;"><?= $desc ?></div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
+        <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </div>
 
