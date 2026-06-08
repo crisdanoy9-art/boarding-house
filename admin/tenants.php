@@ -18,8 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $db->beginTransaction();
 
-                // 1. Get current tenant details before removing
-                $t = $db->prepare('SELECT * FROM bh.tenants WHERE id=?');
+                // 1. Get current tenant details (include bed_id and user_id)
+                $t = $db->prepare('SELECT id, user_id, bed_id FROM bh.tenants WHERE id=?');
                 $t->execute([$tenantId]);
                 $tenant = $t->fetch();
 
@@ -28,25 +28,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $db->prepare("UPDATE bh.tenants SET status='inactive', move_out_date=NOW(), updated_at=NOW() WHERE id=?")
                        ->execute([$tenantId]);
 
-                    // 3. Free the bed (Set to available and remove tenant link)
-                    $db->prepare("UPDATE bh.beds SET status='available', tenant_id=NULL WHERE id=?")
+                    // 3. Free the bed (set status to available; tenant_id column no longer exists)
+                    $db->prepare("UPDATE bh.beds SET status='available' WHERE id=?")
                        ->execute([$tenant['bed_id']]);
 
-                    // 4. Deactivate the user account
+                    // 4. Deactivate the user account (optional)
                     $db->prepare("UPDATE bh.users SET is_active=FALSE WHERE id=?")
                        ->execute([$tenant['user_id']]);
 
-                    // 5. BAG-O NGA LOGIC: Update room status base sa actual bed occupancy
-                    // Ang kwarto mahimo lang 'full' kung naay 4 (o labaw pa) nga 'occupied' beds.
-                    // Kung dili, mahimo siyang 'available'.
-                    $db->prepare("
-                        UPDATE bh.rooms 
-                        SET status = CASE 
-                            WHEN (SELECT COUNT(*) FROM bh.beds WHERE room_id = ? AND status = 'occupied') >= 4 THEN 'full'
-                            ELSE 'available'
-                        END
-                        WHERE id = ?
-                    ")->execute([$tenant['room_id'], $tenant['room_id']]);
+                    // 5. Update room status based on actual bed occupancy
+                    // First, get the room_id from the bed
+                    $roomStmt = $db->prepare("SELECT room_id FROM bh.beds WHERE id=?");
+                    $roomStmt->execute([$tenant['bed_id']]);
+                    $roomId = $roomStmt->fetchColumn();
+
+                    if ($roomId) {
+                        $db->prepare("
+                            UPDATE bh.rooms 
+                            SET status = CASE 
+                                WHEN (SELECT COUNT(*) FROM bh.beds WHERE room_id = ? AND status = 'occupied') >= (SELECT capacity FROM bh.rooms WHERE id = ?)
+                                THEN 'full'
+                                ELSE 'available'
+                            END
+                            WHERE id = ?
+                        ")->execute([$roomId, $roomId, $roomId]);
+                    }
 
                     $db->commit();
                     redirect(APP_URL . '/admin/tenants.php', 'Tenant removed and room status updated.', 'warning');
@@ -59,27 +65,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- Logic para sa Pag-display sa Table (No changes below) ---
+// --- Display Tenants Table (fixed joins) ---
 
 $statusFilter = sanitizeInput($_GET['status'] ?? 'active');
 $page         = max(1, (int)($_GET['page'] ?? 1));
 $perPage      = 15;
 $search       = sanitizeInput($_GET['q'] ?? '');
 
+// Build WHERE clause (using tenants.status)
 $where = "WHERE t.status = '$statusFilter'";
 if ($search) $where .= " AND (u.name ILIKE '%$search%' OR u.email ILIKE '%$search%')";
 
-$total = $db->query("SELECT COUNT(*) FROM bh.tenants t JOIN bh.users u ON u.id=t.user_id $where")->fetchColumn();
+// Count total
+$totalStmt = $db->query("SELECT COUNT(*) FROM bh.tenants t JOIN bh.users u ON u.id = t.user_id $where");
+$total = $totalStmt->fetchColumn();
 $pager = paginate($total, $perPage, $page);
 
+// Fetch tenants with proper joins (tenants → beds → rooms → floors)
 $tenants = $db->prepare("
     SELECT t.*, u.name, u.email, u.phone,
-            r.room_number, f.floor_number, b.bed_number, r.price
+           r.room_number, f.floor_number, b.bed_number, r.price
     FROM bh.tenants t
     JOIN bh.users u ON u.id = t.user_id
-    JOIN bh.rooms r ON r.id = t.room_id
-    JOIN bh.floors f ON f.id = r.floor_id
     JOIN bh.beds b ON b.id = t.bed_id
+    JOIN bh.rooms r ON r.id = b.room_id
+    JOIN bh.floors f ON f.id = r.floor_id
     $where
     ORDER BY t.created_at DESC
     LIMIT $perPage OFFSET {$pager['offset']}
