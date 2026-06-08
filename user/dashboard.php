@@ -206,7 +206,7 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
         </div>
     </div>
 
-    <!-- Contact Us card (right) – moved from its previous centered position -->
+    <!-- Contact Us card (right) -->
     <div class="card">
         <div class="card-header">
             <span class="card-title"><i class="fas fa-headset" style="color:var(--gold);font-size:.85rem;"></i> Contact Us</span>
@@ -261,29 +261,27 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
 </div>
 <?php endif; ?>
 
-<!-- Reservations card (moved below, centered) -->
-<div style="max-width:620px; margin:0 auto 22px;">
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title"><i class="fas fa-calendar-check" style="color:var(--gold);font-size:.85rem;"></i> Reservations</span>
-            <a href="<?= APP_URL ?>/user/reservations.php" class="btn btn-sm btn-ghost">All</a>
-        </div>
-        <?php if (empty($reservations)): ?>
-        <div class="empty-state" style="padding:28px;"><i class="fas fa-calendar-times"></i><h3>No Reservations</h3></div>
-        <?php else: ?>
-        <?php foreach ($reservations as $res):
-            $bm=['pending'=>'warning','approved'=>'success','rejected'=>'danger','cancelled'=>'muted']; ?>
-        <div style="display:flex;align-items:center;gap:12px;padding:13px 22px;border-bottom:1px solid rgba(255,255,255,.04);">
-            <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:<?= ['warning'=>'var(--warning)','success'=>'var(--success)','danger'=>'var(--danger)','muted'=>'var(--muted)'][$bm[$res['status']]??'muted'] ?>"></div>
-            <div style="flex:1;min-width:0;">
-                <div style="font-weight:500;color:var(--white);font-size:.86rem;">F<?= $res['floor_number'] ?> Rm<?= e($res['room_number']) ?> Bed<?= $res['bed_number'] ?></div>
-                <div style="font-size:.73rem;color:var(--muted);"><?= formatDate($res['created_at'],'M d, Y') ?></div>
-            </div>
-            <span class="badge badge-<?= $bm[$res['status']]??'muted' ?>"><?= ucfirst($res['status']) ?></span>
-        </div>
-        <?php endforeach; ?>
-        <?php endif; ?>
+<!-- Reservations card – now FULL WIDTH (no max-width, spans the whole content area) -->
+<div class="card mb-4">
+    <div class="card-header">
+        <span class="card-title"><i class="fas fa-calendar-check" style="color:var(--gold);font-size:.85rem;"></i> Reservations</span>
+        <a href="<?= APP_URL ?>/user/reservations.php" class="btn btn-sm btn-ghost">All</a>
     </div>
+    <?php if (empty($reservations)): ?>
+    <div class="empty-state" style="padding:28px;"><i class="fas fa-calendar-times"></i><h3>No Reservations</h3></div>
+    <?php else: ?>
+    <?php foreach ($reservations as $res):
+        $bm=['pending'=>'warning','approved'=>'success','rejected'=>'danger','cancelled'=>'muted']; ?>
+    <div style="display:flex;align-items:center;gap:12px;padding:13px 22px;border-bottom:1px solid rgba(255,255,255,.04);">
+        <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:<?= ['warning'=>'var(--warning)','success'=>'var(--success)','danger'=>'var(--danger)','muted'=>'var(--muted)'][$bm[$res['status']]??'muted'] ?>"></div>
+        <div style="flex:1;min-width:0;">
+            <div style="font-weight:500;color:var(--white);font-size:.86rem;">F<?= $res['floor_number'] ?> Rm<?= e($res['room_number']) ?> Bed<?= $res['bed_number'] ?></div>
+            <div style="font-size:.73rem;color:var(--muted);"><?= formatDate($res['created_at'],'M d, Y') ?></div>
+        </div>
+        <span class="badge badge-<?= $bm[$res['status']]??'muted' ?>"><?= ucfirst($res['status']) ?></span>
+    </div>
+    <?php endforeach; ?>
+    <?php endif; ?>
 </div>
 
 <style>
