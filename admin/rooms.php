@@ -7,6 +7,7 @@ $db = getDB();
 $errors = [];
 
 define('DEFAULT_MONTHLY_RATE', 1300);
+define('DEFAULT_CAPACITY', 4);   // default beds per room
 
 // Handle actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,27 +20,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $floorId    = (int)$_POST['floor_id'];
             $roomNumber = sanitizeInput($_POST['room_number'] ?? '');
             $price      = (float)($_POST['price'] ?: DEFAULT_MONTHLY_RATE);
+            $capacity   = (int)($_POST['capacity'] ?: DEFAULT_CAPACITY);
             $status     = sanitizeInput($_POST['status'] ?? 'available');
             $amenities  = sanitizeInput($_POST['amenities'] ?? '');
             $desc       = sanitizeInput($_POST['description'] ?? '');
 
             if (!$floorId || !$roomNumber) {
                 $errors[] = 'Floor and room number are required.';
+            } elseif ($capacity < 1 || $capacity > 20) {
+                $errors[] = 'Capacity must be between 1 and 20 beds.';
             } else {
                 try {
+                    $db->beginTransaction();
                     $stmt = $db->prepare(
-                        'INSERT INTO bh.rooms (floor_id, room_number, price, status, amenities, description, created_at)
-                         VALUES (?, ?, ?, ?, ?, ?, NOW())'
+                        'INSERT INTO bh.rooms (floor_id, room_number, price, capacity, status, amenities, description, created_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, NOW())'
                     );
-                    $stmt->execute([$floorId, $roomNumber, $price, $status, $amenities, $desc]);
+                    $stmt->execute([$floorId, $roomNumber, $price, $capacity, $status, $amenities, $desc]);
                     $roomId = (int)$db->lastInsertId();
-                    // Create 4 beds automatically
-                    for ($i = 1; $i <= 4; $i++) {
+                    // Create beds according to capacity
+                    for ($i = 1; $i <= $capacity; $i++) {
                         $db->prepare('INSERT INTO bh.beds (room_id, bed_number, status) VALUES (?, ?, ?)')
                            ->execute([$roomId, $i, 'available']);
                     }
-                    redirect(APP_URL . '/admin/rooms.php', 'Room ' . $roomNumber . ' added with 4 beds at ₱' . number_format($price, 0) . '/mo!');
+                    $db->commit();
+                    redirect(APP_URL . '/admin/rooms.php', "Room {$roomNumber} added with {$capacity} bed(s) at ₱" . number_format($price, 0) . '/mo per bed!');
                 } catch (PDOException $e) {
+                    $db->rollBack();
                     $errors[] = 'Error adding room: ' . $e->getMessage();
                 }
             }
@@ -47,16 +54,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($action === 'edit_room') {
             $roomId    = (int)$_POST['room_id'];
             $price     = (float)($_POST['price'] ?: DEFAULT_MONTHLY_RATE);
+            $newCapacity = (int)($_POST['capacity'] ?: DEFAULT_CAPACITY);
             $status    = sanitizeInput($_POST['status'] ?? 'available');
             $amenities = sanitizeInput($_POST['amenities'] ?? '');
             $desc      = sanitizeInput($_POST['description'] ?? '');
 
-            try {
-                $db->prepare('UPDATE bh.rooms SET price=?, status=?, amenities=?, description=?, updated_at=NOW() WHERE id=?')
-                   ->execute([$price, $status, $amenities, $desc, $roomId]);
-                redirect(APP_URL . '/admin/rooms.php', 'Room updated successfully!');
-            } catch (PDOException $e) {
-                $errors[] = 'Error updating room.';
+            if ($newCapacity < 1 || $newCapacity > 20) {
+                $errors[] = 'Capacity must be between 1 and 20 beds.';
+            } else {
+                try {
+                    $db->beginTransaction();
+
+                    // Update room details
+                    $db->prepare('UPDATE bh.rooms SET price=?, capacity=?, status=?, amenities=?, description=?, updated_at=NOW() WHERE id=?')
+                       ->execute([$price, $newCapacity, $status, $amenities, $desc, $roomId]);
+
+                    // Get current beds
+                    $existing = $db->prepare('SELECT id, bed_number FROM bh.beds WHERE room_id=? ORDER BY bed_number');
+                    $existing->execute([$roomId]);
+                    $existingBeds = $existing->fetchAll(PDO::FETCH_ASSOC);
+                    $currentCount = count($existingBeds);
+
+                    if ($newCapacity > $currentCount) {
+                        // Add new beds
+                        for ($i = $currentCount + 1; $i <= $newCapacity; $i++) {
+                            $db->prepare('INSERT INTO bh.beds (room_id, bed_number, status) VALUES (?, ?, ?)')
+                               ->execute([$roomId, $i, 'available']);
+                        }
+                    } elseif ($newCapacity < $currentCount) {
+                        // Remove extra beds – only if they are not occupied
+                        $toDelete = array_slice($existingBeds, $newCapacity);
+                        foreach ($toDelete as $bed) {
+                            // Check status
+                            if ($bed['status'] !== 'available') {
+                                throw new Exception("Cannot remove bed {$bed['bed_number']} because it is {$bed['status']}.");
+                            }
+                            $db->prepare('DELETE FROM bh.beds WHERE id=?')->execute([$bed['id']]);
+                        }
+                    }
+
+                    $db->commit();
+                    redirect(APP_URL . '/admin/rooms.php', 'Room updated successfully!');
+                } catch (Exception $e) {
+                    $db->rollBack();
+                    $errors[] = 'Error updating room: ' . $e->getMessage();
+                }
             }
 
         } elseif ($action === 'delete_room') {
@@ -126,7 +168,7 @@ if (isset($_GET['edit'])) {
     <div class="deposit-info-icon"><i class="fas fa-info-circle"></i></div>
     <div class="deposit-info-text">
         <div class="deposit-info-title">Standard Rate: ₱1,300/month per bed</div>
-        <div class="deposit-info-sub">Each room has 4 beds. The monthly rate applies per bed/tenant. An advance deposit is collected upon room approval.</div>
+        <div class="deposit-info-sub">Each room can have a custom number of beds. The monthly rate applies per bed/tenant. An advance deposit is collected upon room approval.</div>
     </div>
 </div>
 
@@ -152,6 +194,7 @@ if (isset($_GET['edit'])) {
             <div>
                 <div class="room-number">Room <?= e($room['room_number']) ?></div>
                 <div class="room-floor">Floor <?= $room['floor_number'] ?></div>
+                <div class="room-capacity" style="font-size:0.68rem;color:var(--gold);margin-top:2px;"><?= $room['capacity'] ?> beds total</div>
             </div>
             <span class="badge badge-<?= $b ?>"><?= ucfirst($room['status']) ?></span>
         </div>
@@ -248,6 +291,17 @@ if (isset($_GET['edit'])) {
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">Number of Beds (Capacity) *</label>
+                        <input type="number" name="capacity" class="form-control"
+                               value="<?= DEFAULT_CAPACITY ?>" min="1" max="20" required>
+                        <div style="font-size:0.75rem;color:var(--clr-muted);margin-top:4px;">
+                            Each bed will be created automatically.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-control">
                             <option value="available">Available</option>
@@ -266,11 +320,6 @@ if (isset($_GET['edit'])) {
                 <div class="form-group">
                     <label class="form-label">Description</label>
                     <textarea name="description" class="form-control" rows="2" placeholder="Room details..."></textarea>
-                </div>
-
-                <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:var(--radius-md);padding:12px 14px;font-size:0.82rem;color:var(--clr-muted);margin-bottom:20px;">
-                    <i class="fas fa-info-circle" style="color:var(--clr-gold);"></i>
-                    4 beds will be automatically created for this room.
                 </div>
 
                 <div class="modal-footer" style="padding:0;border:none;">
@@ -303,13 +352,22 @@ if (isset($_GET['edit'])) {
                                value="<?= $editRoom['price'] ?: DEFAULT_MONTHLY_RATE ?>" min="0" step="50" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-control">
-                            <?php foreach (['available','full','maintenance'] as $s): ?>
-                            <option value="<?= $s ?>" <?= $editRoom['status']===$s?'selected':'' ?>><?= ucfirst($s) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <label class="form-label">Number of Beds (Capacity) *</label>
+                        <input type="number" name="capacity" class="form-control"
+                               value="<?= $editRoom['capacity'] ?: DEFAULT_CAPACITY ?>" min="1" max="20" required>
+                        <div style="font-size:0.75rem;color:var(--clr-warning);margin-top:4px;">
+                            <i class="fas fa-exclamation-triangle"></i> Reducing capacity will delete extra beds – only if they are available.
+                        </div>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-control">
+                        <?php foreach (['available','full','maintenance'] as $s): ?>
+                        <option value="<?= $s ?>" <?= $editRoom['status']===$s?'selected':'' ?>><?= ucfirst($s) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="form-group">
