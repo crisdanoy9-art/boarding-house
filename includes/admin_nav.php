@@ -27,7 +27,7 @@ try {
             <span class="sidebar-brand-name" style="font-family:var(--font-display);font-size:.9rem;color:var(--gold);font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Nadelas BH</span>
             <span style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Admin Panel</span>
         </div>
-        <button class="sidebar-toggle" id="sidebarToggle" title="Collapse"><i class="fas fa-bars"></i></button>
+        <!-- Sidebar toggle button removed from here -->
     </div>
 
     <div class="sidebar-user">
@@ -72,7 +72,7 @@ try {
 
 <div class="main-wrapper" id="mainWrapper">
     <header class="topbar">
-        <button class="topbar-toggle" id="topbarToggle"><i class="fas fa-bars"></i></button>
+        <!-- Topbar toggle button removed from here -->
         <h1 class="page-title"><?= e($pageTitle ?? 'Dashboard') ?></h1>
         <div class="topbar-actions" style="margin-left:auto;display:flex;align-items:center;gap:13px;">
             <?php if($annCount>0): ?>
