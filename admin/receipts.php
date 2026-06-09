@@ -5,13 +5,45 @@ $pageTitle = 'Receipt Records';
 $db = getDB();
 $search = sanitizeInput($_GET['q'] ?? '');
 $page = max(1,(int)($_GET['page']??1)); $perPage=20;
+
+// Fixed WHERE clause: join through beds
 $where = "WHERE p.status='paid'";
 if($search) $where .= " AND (u.name ILIKE '%$search%' OR p.reference_number ILIKE '%$search%')";
-$total = $db->query("SELECT COUNT(*) FROM bh.payments p JOIN bh.tenants t ON t.id=p.tenant_id JOIN bh.users u ON u.id=t.user_id $where")->fetchColumn();
-$pager = paginate($total,$perPage,$page);
-$payments = $db->query("SELECT p.*,u.name AS tenant_name,r.room_number,f.floor_number,b.bed_number FROM bh.payments p JOIN bh.tenants t ON t.id=p.tenant_id JOIN bh.users u ON u.id=t.user_id JOIN bh.rooms r ON r.id=t.room_id JOIN bh.floors f ON f.id=r.floor_id JOIN bh.beds b ON b.id=t.bed_id $where ORDER BY p.payment_date DESC LIMIT $perPage OFFSET {$pager['offset']}")->fetchAll();
+
+// Count query (fixed)
+$totalStmt = $db->prepare("
+    SELECT COUNT(*) 
+    FROM bh.payments p 
+    JOIN bh.tenants t ON t.id = p.tenant_id
+    JOIN bh.users u ON u.id = t.user_id
+    $where
+");
+$totalStmt->execute();
+$total = $totalStmt->fetchColumn();
+$pager = paginate($total, $perPage, $page);
+
+// Main query with proper joins: tenants -> beds -> rooms -> floors
+$payments = $db->prepare("
+    SELECT p.*, u.name AS tenant_name, r.room_number, f.floor_number, b.bed_number
+    FROM bh.payments p
+    JOIN bh.tenants t ON t.id = p.tenant_id
+    JOIN bh.users u ON u.id = t.user_id
+    JOIN bh.beds b ON b.id = t.bed_id
+    JOIN bh.rooms r ON r.id = b.room_id
+    JOIN bh.floors f ON f.id = r.floor_id
+    $where
+    ORDER BY p.payment_date DESC
+    LIMIT :limit OFFSET :offset
+");
+$payments->bindValue(':limit', $perPage, PDO::PARAM_INT);
+$payments->bindValue(':offset', $pager['offset'], PDO::PARAM_INT);
+$payments->execute();
+$payments = $payments->fetchAll();
+
 $totalIncome = $db->query("SELECT COALESCE(SUM(amount),0) FROM bh.payments WHERE status='paid'")->fetchColumn();
-include __DIR__.'/../includes/header.php'; include __DIR__.'/../includes/admin_nav.php';
+
+include __DIR__.'/../includes/header.php'; 
+include __DIR__.'/../includes/admin_nav.php';
 ?>
 <div class="d-flex align-center justify-between mb-4" style="flex-wrap:wrap;gap:12px;">
 <div><h2 style="font-family:var(--font-display);font-size:1.4rem;color:var(--white);">Receipt Records</h2><p style="color:var(--muted);font-size:.82rem;">All official paid payment receipts</p></div>
