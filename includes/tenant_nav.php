@@ -1,10 +1,20 @@
 <?php
-$currentPage = basename($_SERVER['PHP_SELF'], '.php');
+// Ensure helper function exists (fallback)
+if (!function_exists('getProfilePicUrl')) {
+    function getProfilePicUrl($image) {
+        if (empty($image) || $image === 'default.png') {
+            return '';
+        }
+        return APP_URL . '/uploads/profile/' . rawurlencode($image);
+    }
+}
 
+$currentPage = basename($_SERVER['PHP_SELF'], '.php');
 $profilePicUrl = getProfilePicUrl($currentUser['profile_image'] ?? '');
 ?>
 <!-- Tenant Sidebar -->
 <aside class="tenant-sidebar" id="tenantSidebar">
+    <!-- Header -->
     <div class="sidebar-header">
         <div class="nbh-logo">NBH</div>
         <div class="sidebar-brand">
@@ -16,6 +26,7 @@ $profilePicUrl = getProfilePicUrl($currentUser['profile_image'] ?? '');
         </button>
     </div>
 
+    <!-- User info -->
     <div class="sidebar-user">
         <div class="user-avatar">
             <?php if($profilePicUrl): ?>
@@ -30,6 +41,7 @@ $profilePicUrl = getProfilePicUrl($currentUser['profile_image'] ?? '');
         </div>
     </div>
 
+    <!-- Navigation links -->
     <ul class="sidebar-nav">
         <?php
         $navItems = [
@@ -52,16 +64,17 @@ $profilePicUrl = getProfilePicUrl($currentUser['profile_image'] ?? '');
             </a>
         </li>
         <?php endforeach; ?>
-        <li class="nav-item">
-            <a href="<?= APP_URL ?>/auth/logout.php" class="logout-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
-        </li>
     </ul>
+
+    <!-- Logout link -->
+    <div class="sidebar-footer">
+        <a href="<?= APP_URL ?>/auth/logout.php" class="logout-link">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </div>
 </aside>
 
 <!-- Main wrapper for content -->
 <div class="tenant-main-wrapper" id="tenantMainWrapper">
-    <!-- Dynamic tenant content will be inserted here -->
     <div class="tenant-content">
