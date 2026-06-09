@@ -174,10 +174,10 @@ $chartStatus   = [(int)($roomStatus['available']??0),(int)($roomStatus['full']??
     </div>
 </div>
 
-<!-- Income Chart -->
+<!-- Income Chart – now with explicit ₱ label on Y‑axis and card title -->
 <div class="card mb-4">
     <div class="card-header">
-        <span class="card-title">Monthly Income — Last 6 Months</span>
+        <span class="card-title">Monthly Income (₱) — Last 6 Months</span>
         <a href="<?= APP_URL ?>/admin/reports.php" class="btn btn-sm btn-outline">Full Report</a>
     </div>
     <div class="card-body">
