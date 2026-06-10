@@ -53,14 +53,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = getCurrentUser(); // Refresh
 }
 
-// Get tenancy info
+// Get tenancy info (via beds)
 $tenancy = $db->prepare("
     SELECT t.*, r.room_number, f.floor_number, b.bed_number, r.price
     FROM bh.tenants t
-    JOIN bh.rooms r ON r.id=t.room_id
-    JOIN bh.floors f ON f.id=r.floor_id
-    JOIN bh.beds b ON b.id=t.bed_id
-    WHERE t.user_id=? AND t.status='active'
+    JOIN bh.beds b ON b.id = t.bed_id
+    JOIN bh.rooms r ON r.id = b.room_id
+    JOIN bh.floors f ON f.id = r.floor_id
+    WHERE t.user_id = ? AND t.status = 'active'
     LIMIT 1
 ");
 $tenancy->execute([$uid]);
