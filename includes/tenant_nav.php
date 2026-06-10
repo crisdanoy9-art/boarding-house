@@ -21,9 +21,7 @@ $profilePicUrl = getProfilePicUrl($currentUser['profile_image'] ?? '');
             <div class="sidebar-brand-name">Nadelas</div>
             <div class="sidebar-brand-sub">Boarding House</div>
         </div>
-        <button class="sidebar-toggle" id="tenantSidebarToggle" aria-label="Collapse">
-            <i class="fas fa-chevron-left"></i>
-        </button>
+        <!-- Sidebar toggle button removed from here -->
     </div>
 
     <!-- User info -->
