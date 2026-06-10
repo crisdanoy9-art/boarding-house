@@ -18,21 +18,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif ($existingTenancy) { $errors[] = 'You already have an active room.'; }
     elseif ($pendingRes) { $errors[] = 'You have a pending/approved reservation.'; }
     else {
-        $roomId   = (int)$_POST['room_id'];
         $bedId    = (int)$_POST['bed_id'];
         $moveIn   = sanitizeInput($_POST['move_in_date'] ?? '');
         $notes    = sanitizeInput($_POST['notes'] ?? '');
 
-        if (!$roomId || !$bedId || !$moveIn) { $errors[] = 'Please select a room, bed, and move-in date.'; }
+        if (!$bedId || !$moveIn) { $errors[] = 'Please select a bed and move-in date.'; }
         elseif (strtotime($moveIn) < strtotime('today')) { $errors[] = 'Move-in date cannot be in the past.'; }
         else {
             try {
                 $db->beginTransaction();
-                $bc = $db->prepare("SELECT id FROM bh.beds WHERE id=? AND room_id=? AND status='available'");
-                $bc->execute([$bedId,$roomId]);
-                if (!$bc->fetch()) throw new Exception('That bed is no longer available. Please pick another.');
+                $bc = $db->prepare("SELECT id, room_id FROM bh.beds WHERE id=? AND status='available'");
+                $bc->execute([$bedId]);
+                $bed = $bc->fetch();
+                if (!$bed) throw new Exception('That bed is no longer available. Please pick another.');
 
-                $db->prepare("INSERT INTO bh.reservations(user_id,room_id,bed_id,move_in_date,notes,status,created_at) VALUES(?,?,?,?,?,'pending',NOW())")->execute([$uid,$roomId,$bedId,$moveIn,$notes]);
+                $db->prepare("INSERT INTO bh.reservations(user_id, bed_id, move_in_date, notes, status, created_at) VALUES(?,?,?,?,'pending', NOW())")
+                   ->execute([$uid, $bedId, $moveIn, $notes]);
                 $db->prepare("UPDATE bh.beds SET status='reserved' WHERE id=?")->execute([$bedId]);
                 $db->commit();
                 redirect(APP_URL.'/user/reservations.php','✅ Reservation submitted! Admin will review and approve.','success');
@@ -51,7 +52,7 @@ $rooms = $db->prepare("
     JOIN bh.floors f ON f.id=r.floor_id
     LEFT JOIN bh.beds b ON b.room_id=r.id
     WHERE f.floor_number=? AND r.status != 'maintenance'
-    GROUP BY r.id,f.floor_number,f.floor_name
+    GROUP BY r.id, f.floor_number, f.floor_name
     ORDER BY r.room_number
 ");
 $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
@@ -69,7 +70,7 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
 <div class="info-banner"><i class="fas fa-clock"></i> <div>You have a <strong><?= $pendingRes['status'] ?></strong> reservation pending. <a href="<?= APP_URL ?>/user/reservations.php" style="color:var(--gold);font-weight:600;">View it →</a></div></div>
 <?php endif; ?>
 
-<!-- Booking Flow Steps -->
+<!-- Booking Flow Steps (simplified, no GCash) -->
 <?php if (!$existingTenancy && !$pendingRes): ?>
 <div style="display:flex;align-items:center;gap:0;margin-bottom:22px;overflow:hidden;">
     <?php foreach ([['1','Select Bed'],['2','Submit Details'],['3','Admin Approves']] as $i=>[$n,$lbl]): ?>
@@ -119,6 +120,7 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
             <div>
                 <div class="room-number">Room <?= e($room['room_number']) ?></div>
                 <div class="room-floor">Floor <?= $room['floor_number'] ?></div>
+                <div class="room-capacity" style="font-size:0.68rem;color:var(--gold);margin-top:2px;"><?= $room['capacity'] ?> beds total</div>
             </div>
             <span class="badge badge-<?= $hasAvail?'success':'danger' ?>"><?= $hasAvail?$room['available_count'].' open':'Full' ?></span>
         </div>
@@ -151,7 +153,7 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
 </div>
 <?php endif; ?>
 
-<!-- Booking Overlay Modal (simplified, no GCash) -->
+<!-- Booking Overlay Modal (no GCash) -->
 <div class="booking-overlay" id="bookingOverlay">
 <div class="booking-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);">
@@ -165,8 +167,7 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
     <div style="padding:20px 22px;">
         <form method="POST" action="" data-validate id="bookingForm">
             <?= csrfField() ?>
-            <input type="hidden" name="room_id" id="formRoomId">
-            <input type="hidden" name="bed_id"  id="formBedId">
+            <input type="hidden" name="bed_id" id="formBedId">
 
             <div class="form-group">
                 <label class="form-label">Move-In Date *</label>
@@ -212,7 +213,6 @@ function selectBed(el) {
     document.getElementById('sumFloor').textContent = el.dataset.floor;
     document.getElementById('sumRoom').textContent  = el.dataset.room;
     document.getElementById('sumBed').textContent   = el.dataset.bedNum;
-    document.getElementById('formRoomId').value     = el.dataset.roomId;
     document.getElementById('formBedId').value      = el.dataset.bedId;
 
     const overlay = document.getElementById('bookingOverlay');
