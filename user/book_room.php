@@ -199,6 +199,11 @@ $rooms->execute([$currentFloor]); $rooms = $rooms->fetchAll();
 </div>
 </div>
 
+<!-- Custom Footer (copyright line) -->
+<div style="text-align:center; margin-top:32px; padding:16px 0; border-top:1px solid var(--border); color:var(--muted); font-size:.78rem;">
+    <p>© <?= date('Y') ?> Nadelas Boarding House · All Rights Reserved</p>
+</div>
+
 <script>
 let selBedEl = null;
 function selectBed(el) {
