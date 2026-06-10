@@ -7,15 +7,16 @@ $db  = getDB();
 $uid = $_SESSION['user_id'];
 $user = getCurrentUser();
 
-// Active tenancy
+// Active tenancy (via beds)
 $tenancy = $db->prepare("
     SELECT t.*, r.room_number, r.price, f.floor_number, f.floor_name,
            b.bed_number, r.amenities, t.advance_deposit_paid
     FROM bh.tenants t
-    JOIN bh.rooms r ON r.id=t.room_id
-    JOIN bh.floors f ON f.id=r.floor_id
-    JOIN bh.beds b ON b.id=t.bed_id
-    WHERE t.user_id=? AND t.status='active' LIMIT 1
+    JOIN bh.beds b ON b.id = t.bed_id
+    JOIN bh.rooms r ON r.id = b.room_id
+    JOIN bh.floors f ON f.id = r.floor_id
+    WHERE t.user_id = ? AND t.status = 'active'
+    LIMIT 1
 ");
 $tenancy->execute([$uid]);
 $tenancy = $tenancy->fetch();
@@ -25,12 +26,16 @@ $pendingRes = $db->prepare("SELECT id,status FROM bh.reservations WHERE user_id=
 $pendingRes->execute([$uid]);
 $pendingRes = $pendingRes->fetch();
 
-// Recent reservations
+// Recent reservations (correct join via beds)
 $reservations = $db->prepare("
-    SELECT res.*,r.room_number,f.floor_number,b.bed_number
-    FROM bh.reservations res JOIN bh.rooms r ON r.id=res.room_id
-    JOIN bh.floors f ON f.id=r.floor_id JOIN bh.beds b ON b.id=res.bed_id
-    WHERE res.user_id=? ORDER BY res.created_at DESC LIMIT 5
+    SELECT res.*, r.room_number, f.floor_number, b.bed_number
+    FROM bh.reservations res
+    JOIN bh.beds b ON b.id = res.bed_id
+    JOIN bh.rooms r ON r.id = b.room_id
+    JOIN bh.floors f ON f.id = r.floor_id
+    WHERE res.user_id = ?
+    ORDER BY res.created_at DESC
+    LIMIT 5
 ");
 $reservations->execute([$uid]);
 $reservations = $reservations->fetchAll();
@@ -165,7 +170,6 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
 
 <!-- Two-column grid: My Room (left) and Contact Us (right) -->
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px;">
-    <!-- My Room card (left) -->
     <div class="card">
         <div class="card-header">
             <span class="card-title"><i class="fas fa-home" style="color:var(--gold);font-size:.85rem;"></i> My Room</span>
@@ -206,7 +210,6 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
         </div>
     </div>
 
-    <!-- Contact Us card (right) -->
     <div class="card">
         <div class="card-header">
             <span class="card-title"><i class="fas fa-headset" style="color:var(--gold);font-size:.85rem;"></i> Contact Us</span>
@@ -233,7 +236,7 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
     </div>
 </div>
 
-<!-- Recent payments (if any) -->
+<!-- Recent payments -->
 <?php if ($payments && !empty($payments)): ?>
 <div class="card mb-4">
     <div class="card-header">
@@ -261,7 +264,7 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
 </div>
 <?php endif; ?>
 
-<!-- Reservations card – now FULL WIDTH (no max-width, spans the whole content area) -->
+<!-- Reservations card – full width -->
 <div class="card mb-4">
     <div class="card-header">
         <span class="card-title"><i class="fas fa-calendar-check" style="color:var(--gold);font-size:.85rem;"></i> Reservations</span>
@@ -282,6 +285,11 @@ $paymentWarning = $daysUntilDue <= 3 && $daysUntilDue >= 0;
     </div>
     <?php endforeach; ?>
     <?php endif; ?>
+</div>
+
+<!-- Dashboard Footer -->
+<div style="text-align:center; margin-top:32px; padding:20px 0; border-top:1px solid var(--border); color:var(--muted); font-size:.78rem;">
+    <p>© <?= date('Y') ?> Nadelas Boarding House · All Rights Reserved</p>
 </div>
 
 <style>
