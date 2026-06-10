@@ -4,7 +4,17 @@ requireLogin();
 $pageTitle = 'Payment Receipts';
 $db=$uid=$user=null;
 $db = getDB(); $uid=$_SESSION['user_id']; $user=getCurrentUser();
-$tenant=$db->prepare("SELECT t.*,r.room_number,r.price,f.floor_number,f.floor_name,b.bed_number FROM bh.tenants t JOIN bh.rooms r ON r.id=t.room_id JOIN bh.floors f ON f.id=r.floor_id JOIN bh.beds b ON b.id=t.bed_id WHERE t.user_id=? AND t.status='active' LIMIT 1");
+
+// Corrected tenant query via beds
+$tenant=$db->prepare("
+    SELECT t.*, r.room_number, r.price, f.floor_number, f.floor_name, b.bed_number
+    FROM bh.tenants t
+    JOIN bh.beds b ON b.id = t.bed_id
+    JOIN bh.rooms r ON r.id = b.room_id
+    JOIN bh.floors f ON f.id = r.floor_id
+    WHERE t.user_id = ? AND t.status = 'active'
+    LIMIT 1
+");
 $tenant->execute([$uid]); $tenant=$tenant->fetch();
 $payments=[];
 if($tenant){$s=$db->prepare("SELECT * FROM bh.payments WHERE tenant_id=? AND status='paid' ORDER BY payment_date DESC");$s->execute([$tenant['id']]);$payments=$s->fetchAll();}
