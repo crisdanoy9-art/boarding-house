@@ -1478,3 +1478,61 @@ select.form-control {
     display: block;
   }
 }
+
+/* ── Enhanced container hover effects ── */
+.card,
+.stat-card,
+.feature-card,
+.room-card,
+.rule-card-tenant,
+.dev-card,
+.quick-action-card,
+.receipt-list-item,
+.about-hero,
+.maintenance-box {
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1) !important;
+}
+
+.card:hover,
+.stat-card:hover,
+.feature-card:hover,
+.room-card:hover,
+.rule-card-tenant:hover,
+.dev-card:hover,
+.quick-action-card:hover,
+.receipt-list-item:hover {
+    transform: translateY(-6px) !important;
+    border-color: rgba(201, 168, 76, 0.5) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(201, 168, 76, 0.2), var(--shadow-gold) !important;
+}
+
+/* Special highlight for stat cards */
+.stat-card:hover .stat-icon {
+    transform: scale(1.08);
+    transition: transform 0.25s ease;
+}
+
+/* Bed slots hover (already available) – keep consistent */
+.bed-slot.available:hover {
+    transform: scale(1.08) !important;
+    box-shadow: 0 6px 16px rgba(62, 207, 110, 0.25) !important;
+}
+
+/* Buttons already have hover; ensure no conflict */
+.btn {
+    transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1) !important;
+}
+
+.btn-primary:hover,
+.btn-outline:hover,
+.btn-ghost:hover,
+.btn-danger:hover,
+.btn-success:hover {
+    transform: translateY(-2px) !important;
+}
+
+/* Table rows subtle highlight */
+tbody tr:hover td {
+    background: rgba(201, 168, 76, 0.05) !important;
+    transition: background 0.2s ease;
+}
