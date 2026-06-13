@@ -113,7 +113,7 @@ try {
         <div style="text-align:center;margin-bottom:48px;">
             <span style="display:inline-flex;align-items:center;gap:7px;padding:5px 16px;border-radius:99px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);font-size:.72rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;"><i class="fas fa-gavel"></i> House Policies</span>
             <h2 class="section-title">Rules & Regulations</h2>
-            <p class="section-sub">All tenants must follow these rules. Violations may result in eviction.</p>
+            <p class="section-sub">All tenants must follow these Strict rules. Violations may result in eviction.</p>
         </div>
         
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px;">
