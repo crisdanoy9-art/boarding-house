@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($reservation) {
                     $db->prepare("UPDATE bh.reservations SET status='cancelled', updated_at=NOW() WHERE id=?")
                        ->execute([$resId]);
-                    $db->prepare("UPDATE bh.beds SET status='available', tenant_id=NULL WHERE id=? AND status='reserved'")
+                    $db->prepare("UPDATE bh.beds SET status='available' WHERE id=? AND status='reserved'")
                        ->execute([$reservation['bed_id']]);
                     $db->commit();
                     redirect(APP_URL . '/user/reservations.php', 'Reservation cancelled.', 'warning');
@@ -42,15 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all user reservations
+// Fetch all user reservations using normalized schema (bed_id → beds → rooms → floors)
 $reservations = $db->prepare("
-    SELECT res.*, r.room_number, f.floor_number, f.floor_name,
-           b.bed_number, r.price, r.amenities
+    SELECT res.*, 
+           r.room_number, f.floor_number, f.floor_name,
+           b.bed_number, r.price
     FROM bh.reservations res
-    JOIN bh.rooms r ON r.id=res.room_id
-    JOIN bh.floors f ON f.id=r.floor_id
-    JOIN bh.beds b ON b.id=res.bed_id
-    WHERE res.user_id=?
+    JOIN bh.beds b ON b.id = res.bed_id
+    JOIN bh.rooms r ON r.id = b.room_id
+    JOIN bh.floors f ON f.id = r.floor_id
+    WHERE res.user_id = ?
     ORDER BY res.created_at DESC
 ");
 $reservations->execute([$uid]);
@@ -94,7 +95,6 @@ $reservations = $reservations->fetchAll();
     <div class="card">
         <div class="card-body" style="padding:24px;">
             <div style="display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:start;">
-                <!-- Icon -->
                 <div style="width:48px;height:48px;border-radius:var(--radius-md);
                             background:rgba(201,168,76,0.1);display:flex;
                             align-items:center;justify-content:center;
@@ -102,7 +102,6 @@ $reservations = $reservations->fetchAll();
                     <i class="fas fa-bed"></i>
                 </div>
 
-                <!-- Info -->
                 <div>
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
                         <h3 style="font-family:var(--font-display);color:var(--clr-white);font-size:1.1rem;">
@@ -122,24 +121,15 @@ $reservations = $reservations->fetchAll();
                         <i class="fas fa-comment"></i> Admin Note: <?= e($res['admin_notes']) ?>
                     </div>
                     <?php endif; ?>
-                    <?php if ($res['amenities']): ?>
-                    <div class="room-amenities" style="margin-top:10px;">
-                        <?php foreach (array_slice(explode(',', $res['amenities']), 0, 4) as $a): ?>
-                        <span class="amenity-tag"><?= e(trim($a)) ?></span>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
                 </div>
 
-                <!-- Actions -->
                 <div>
                     <?php if ($res['status'] === 'pending'): ?>
                     <form method="POST">
                         <?= csrfField() ?>
                         <input type="hidden" name="action" value="cancel">
                         <input type="hidden" name="reservation_id" value="<?= $res['id'] ?>">
-                        <button type="submit" class="btn btn-sm btn-danger"
-                                data-confirm="Cancel this reservation?">
+                        <button type="submit" class="btn btn-sm btn-danger" data-confirm="Cancel this reservation?">
                             <i class="fas fa-times"></i> Cancel
                         </button>
                     </form>
