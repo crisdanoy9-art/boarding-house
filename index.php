@@ -69,7 +69,7 @@ try {
         <h1>Your <span class="accent">Perfect Room</span><br>Awaits You</h1>
         <p>Modern, affordable boarding rooms with secure online booking. Live well, pay smart.</p>
         <div class="hero-cta">
-            <a href="<?= APP_URL ?>/auth/register.php" class="btn btn-primary btn-lg"><i class="fas fa-bed"></i> Book a Room</a>
+            <a href="<?= APP_URL ?>/auth/register.php" class="btn btn-primary btn-lg"><i class="fas fa-bed"></i> Book a Room Now!</a>
         </div>
     </div>
 </section>
